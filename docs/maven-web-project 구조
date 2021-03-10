@@ -1,0 +1,49 @@
+helloweb
+|------[/src]
+|       |------[/main]            
+|       |       |------ [/java]      
+|       |       |			|--- /com
+|       |       |				   |--- /bitacademy
+|       |       |				   			|--- /helloweb
+|       |       |				   					|--- /controller
+|       |       |				   							|--- HelloServlet.java
+|       |       |
+|       |       |------  [/resource]
+|       |       |			|------  /config
+|       |       |						|------  db.properties
+요 밑의 부분이 WAR로 압축된다
+java는 compile 되고, resource는 복사된다. 
+
+|       |       |------  [/webapp]
+|       |       |			|------  index.jsp
+|       |       |			|------  /WEB-INF
+|       |       |						|------  /lib
+|       |       |						|			|--- mysql-jdbc-connector.jar
+|       |       |						|------  /classes
+|       |       |									|--- /com
+|       |       |				   							|--- /bitacademy
+|       |       |				 						  			|--- /helloweb
+|       |       |				   											|--- /controller
+|       |       |				   													|--- HelloServlet.java
+
+
+|       |---[/test]
+|       |       |------ [/java]      
+|       |       |			|--- /com
+|       |       |				   |--- /bitacademy
+|       |       |				   			|--- /helloweb
+|       |       |				   					|--- /controller
+|       |       |				   							|--- /test
+|       |       |				   									|--- HelloServletTest.java
+|       |       |			|--- EmailListDaoTest.java
+|       |       |
+|       |       |------  [/resource]
+
+
+|       |
+|       |----
+|       |       |---- /java
+
+소스 = package + 
+		code(*.java) + 
+		resources(*.xml, *.properties, *.yml) 
