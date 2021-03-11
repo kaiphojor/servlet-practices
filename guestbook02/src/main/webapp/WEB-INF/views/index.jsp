@@ -1,10 +1,10 @@
-<%@page import="com.bitacademy.guestbook01.vo.GuestbookVo"%>
+<%@page import="com.bitacademy.guestbook02.vo.GuestbookVo"%>
 <%@page import="java.util.List"%>
-<%@page import="com.bitacademy.guestbook01.dao.GuestbookDao"%>
+<%@page import="com.bitacademy.guestbook02.dao.GuestbookDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
-List<GuestbookVo> list = new GuestbookDao().selectAll();
+List<GuestbookVo> list = (List<GuestbookVo>)request.getAttribute("list");
 %>
 <html>
 <head>
@@ -12,7 +12,7 @@ List<GuestbookVo> list = new GuestbookDao().selectAll();
 <title>방명록</title>
 </head>
 <body>
-	<form action="/guestbook01/add.jsp" method="post">
+	<form action="<%=request.getContextPath()%>/gb?a=add" method="post">
 	<table border=1 width=500>
 		<tr>
 			<td>이름</td><td><input type="text" name="name"></td>
@@ -35,7 +35,7 @@ List<GuestbookVo> list = new GuestbookDao().selectAll();
 			<td>[<%=vo.getNo() %>]</td>
 			<td><%= vo.getName() %></td>
 			<td><%= vo.getRegDate() %></td>
-			<td><a href="/guestbook01/deleteform.jsp?no=<%=vo.getNo() %>">삭제</a></td>
+			<td><a href="<%=request.getContextPath() %>/gb?a=deleteform&no=<%=vo.getNo() %>">삭제</a></td>
 		</tr>
 		<tr>
 			<td colspan=4><%=vo.getContents()%></td>

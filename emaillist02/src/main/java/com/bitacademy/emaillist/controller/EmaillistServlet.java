@@ -21,13 +21,25 @@ public class EmaillistServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //		http://localhost:8080/emaillist02/el?a=list 에 응답
+		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		if("list".equals(action)) {
 			response.getWriter().print("list");
 		}else if("form".equals(action)) {
 			WebUtil.forward("/WEB-INF/views/form.jsp",request,response);			
 		}else if("add".equals(action)) {
-			response.getWriter().print("add");
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			String email = request.getParameter("email");
+
+			EmaillistVo vo = new EmaillistVo();
+			vo.setFirstName(firstName);
+			vo.setLastName(lastName);
+			vo.setEmail(email);
+
+			new EmaillistDao().insert(vo);
+			WebUtil.redirect(request.getContextPath() + "/el",request,response);
+			
 		}else{
 			//control하는 역할 DAO(Model) 호출 - 
 			List<EmaillistVo> list = new EmaillistDao().findAll();
@@ -35,9 +47,7 @@ public class EmaillistServlet extends HttpServlet {
 			// forwarding = request dispatch = request extension
 			request.setAttribute("list",list);
 			WebUtil.forward("/WEB-INF/views/index.jsp",request,response);
-//			response.getWriter().print("index");
 		}
-//		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
