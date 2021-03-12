@@ -28,6 +28,25 @@ public class UserServlet extends HttpServlet {
 			WebUtil.forward("/WEB-INF/views/user/joinform.jsp", request, response);
 		}else if("loginform".equals(action)) {
 			WebUtil.forward("/WEB-INF/views/user/loginform.jsp", request, response);
+		}else if("updateform".equals(action)) {
+			// Access control (접근 제어)
+			HttpSession session = request.getSession();
+			if(session == null){
+				WebUtil.redirect(request.getContextPath(), request, response);
+				return;
+			}
+			
+			UserVo authUser = (UserVo)session.getAttribute("authUser");
+			if(authUser == null) {
+				WebUtil.redirect(request.getContextPath(), request, response);
+				return;				
+			}
+			
+			Long no = authUser.getNo();
+//			UserVo userVo = new UserDao().findByNo(no);
+			UserVo userVo = new UserVo();
+			request.setAttribute("userVo", userVo);			
+			WebUtil.forward("/WEB-INF/views/user/updateform.jsp", request, response);
 		}else if("logout".equals(action)) {
 			HttpSession session = request.getSession();
 			if(session == null) {
