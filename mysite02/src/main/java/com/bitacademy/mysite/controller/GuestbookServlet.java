@@ -42,7 +42,7 @@ public class GuestbookServlet extends HttpServlet {
 		} else {
 			List<GuestbookVo> list = new GuestbookDao().selectAll();
 			request.setAttribute("list", list);
-			WebUtil.forward("/WEB-INF/views/guestbook/list.jsp", request, response);
+			WebUtil.forward("/WEB-INF/views/guestbook/index.jsp", request, response);
 		}
 	}
 
