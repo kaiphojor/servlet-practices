@@ -12,6 +12,49 @@ import com.bitacademy.mysite.vo.GuestbookVo;
 import com.bitacademy.mysite.vo.UserVo;
 
 public class UserDao {
+	// 이메일, 비밀번호가 일치하는 user를 가져온다. 
+	public UserVo findByEmailAndPassword(UserVo vo) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		UserVo userVo = null;
+		ResultSet rs = null;
+		try {
+			conn = getConnection();
+			String sql =  "select no, name  "
+					+ "	from user "
+					+ "	where email=? and password=?;";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, vo.getEmail());
+			pstmt.setString(2, vo.getPassword());
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				Long no = rs.getLong(1);
+				String email = rs.getString(2);
+				userVo = new UserVo(); 
+				userVo.setNo(no);
+				userVo.setEmail(email);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(rs != null) {
+					rs.close();
+				}
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return userVo;
+	}
 	// 사용자 추가
 	public boolean insert(UserVo vo) {
 		boolean result = false;

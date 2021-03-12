@@ -34,8 +34,6 @@ public class UserServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-//		doGet(request, response);
 		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		if("login".equals(action)) {
@@ -46,17 +44,27 @@ public class UserServlet extends HttpServlet {
 			userVo.setEmail(email);
 			userVo.setPassword(password);
 			
-			response.setContentType("text/html; charset=UTF-8");
-			if(new UserDao().select(userVo)) {
-//				PrintWriter writer = response.getWriter();
-//				writer.println("<script>alert('로그인 성공');</script>");
-//				writer.close();
-				WebUtil.redirect(request.getContextPath(), request, response);
-			}else {
-				PrintWriter writer = response.getWriter();
-				writer.println("<script>alert('로그인 실패');history.back();</script>");
-				writer.close();
+			UserVo authUser = new UserDao().findByEmailAndPassword(userVo); 
+			System.out.println(authUser);
+			if(authUser == null) {
+				request.setAttribute("authResult", "fail");
+				WebUtil.forward("/WEB-INF/views/user/loginform.jsp", request, response);
+				return;
 			}
+			// 인증 처리 
+			WebUtil.redirect(request.getContextPath(), request, response);
+			
+//			response.setContentType("text/html; charset=UTF-8");
+//			if(new UserDao().select(userVo)) {
+////				PrintWriter writer = response.getWriter();
+////				writer.println("<script>alert('로그인 성공');</script>");
+////				writer.close();
+//				WebUtil.redirect(request.getContextPath(), request, response);
+//			}else {
+//				PrintWriter writer = response.getWriter();
+//				writer.println("<script>alert('로그인 실패');history.back();</script>");
+//				writer.close();
+//			}
 		}else if("join".equals(action)) {
 			String name = request.getParameter("name");
 			String email = request.getParameter("email");
