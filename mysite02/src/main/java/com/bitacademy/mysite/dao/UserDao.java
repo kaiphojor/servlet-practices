@@ -31,10 +31,10 @@ public class UserDao {
 			
 			if(rs.next()) {
 				Long no = rs.getLong(1);
-				String email = rs.getString(2);
+				String name = rs.getString(2);
 				userVo = new UserVo(); 
 				userVo.setNo(no);
-				userVo.setEmail(email);
+				userVo.setName(name);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
