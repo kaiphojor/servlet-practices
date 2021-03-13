@@ -16,8 +16,8 @@ public class MainServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("doGet() called");
 		int visitCount = 0;
-		
 //		getServletContext().setAttribute(getServletName(), response);
 		
 		// 쿠키 읽기
@@ -40,6 +40,27 @@ public class MainServlet extends HttpServlet {
 	}
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
+	}
+	@Override
+	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		System.out.println("service() called");
+		// TODO Auto-generated method stub
+		super.service(req, resp);
+	}
+	@Override
+	public void destroy() {
+		System.out.println("destroy() called");
+		// TODO Auto-generated method stub
+		super.destroy();
+	}
+	@Override
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		System.out.println("init() called");
+		String configPath = this.getServletConfig().getInitParameter("config");
+		System.out.println("config path - " + configPath);
+		super.init();
+		
 	}
 
 }

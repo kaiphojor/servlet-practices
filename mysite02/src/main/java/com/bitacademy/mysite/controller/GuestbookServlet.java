@@ -27,7 +27,6 @@ public class GuestbookServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
 
 		String action = request.getParameter("a");
 		// 방명록 삭제 화면
@@ -48,7 +47,6 @@ public class GuestbookServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		if ("insert".equals(action)) {
 			String name = request.getParameter("name");

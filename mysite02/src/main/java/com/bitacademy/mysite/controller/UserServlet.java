@@ -21,7 +21,6 @@ public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		
 		if("joinform".equals(action)) {
@@ -65,7 +64,6 @@ public class UserServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		if("login".equals(action)) {
 			String email = request.getParameter("email");

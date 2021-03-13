@@ -11,12 +11,16 @@
   </welcome-file-list>
   <servlet>
   	<description></description>
-  	<display-name>MainServlet</display-name>
   	<servlet-name>MainServlet</servlet-name>
   	<servlet-class>com.bitacademy.mysite.controller.MainServlet</servlet-class>
+  	<init-param>
+  		<param-name>config</param-name>
+  		<param-value>/WEB-INF/servlet-context.xml</param-value>
+  	</init-param>
   </servlet>
   <servlet-mapping>
   	<servlet-name>MainServlet</servlet-name>
   	<url-pattern></url-pattern>
   </servlet-mapping>
+
 </web-app>

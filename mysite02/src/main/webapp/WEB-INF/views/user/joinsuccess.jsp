@@ -1,3 +1,6 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -23,7 +26,7 @@
 				<p class="jr-success">
 					회원가입을 축하합니다.
 					<br><br>
-					<a href="<%=request.getContextPath() %>/user?a=loginform">로그인하기</a>
+					<a href="${pageContext.request.contextPath }/user?a=loginform">로그인하기</a>
 				</p>				
 			</div>
 		</div>
