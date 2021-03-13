@@ -26,34 +26,37 @@
 						<th>조회수</th>
 						<th>작성일</th>
 						<th>&nbsp;</th>
-					</tr>				
-					<tr>
-						<td>3</td>
-						<td>
-							<a href="" style="text-align:Left; padding-left:${(vo.depth-1)*20}">세 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-10-11 12:04:20</td>
-						<td><a href="" class="del">삭제</a></td>
 					</tr>
-					<tr>
-						<td>2</td>
-						<td>
-						<a href="" style="text-align:Left; padding-left:20px"> <img src="${pageContext.request.contextPath}/assets/images/reply.png"/>두 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-10-02 12:04:12</td>
-						<td><a href="" class="del">삭제</a></td>
-					</tr>
-					<tr>
-						<td>1</td>
-						<td>
-						<a href="" style="text-align:Left; padding-left:10px"><img src="${pageContext.request.contextPath}/assets/images/reply.png">첫 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-09-25 07:24:32</td>
-						<td><a href="" class="del">삭제</a></td>
-					</tr>
+					<c:set var="count" value="${fn:length(list)}"/>
+					<c:forEach items="${list}" var="vo" varStatus="status">
+						<tr>
+							<td>${count - status.index}</td>
+							<td style="text-align:Left; padding-left:${(vo.depth-1)*40}">
+								<a href="${pageContext.request.contextPath}/board?a=view&no=${vo.no}" >
+								<c:if test="${vo.depth > 0 }">
+									<img src="${pageContext.request.contextPath}/assets/images/reply.png">
+								</c:if>
+								${vo.title}
+								</a>
+							</td>
+							<td>${vo.userName }</td>
+							<td>${vo.views }</td>
+							<td>${vo.regDate }</td>
+							<td>
+								<c:choose>
+									<c:when test="${authUser.no == vo.userNo }">
+										<a href="${pageContext.request.contextPath}/board?a=delete&no=${vo.no}" class="del">삭제</a>
+									</c:when>
+									<c:when test="${empty authUser }">
+										<a href="${pageContext.request.contextPath}/board?a=delete&no=${vo.no}" class="del">삭제</a>
+									</c:when>
+									<c:otherwise>
+										<a href="" class="del">로그인함</a>
+									</c:otherwise>
+								</c:choose>
+							</td>
+<!-- 						</tr>	 -->
+					</c:forEach>				
 				</table>
 				
 				<!-- pager 추가 -->
@@ -69,10 +72,11 @@
 					</ul>
 				</div>					
 				<!-- pager 추가 -->
-				
-				<div class="bottom">
-					<a href="" id="new-book">글쓰기</a>
-				</div>				
+				<c:if test="${not empty authUser}">
+					<div class="bottom">
+						<a href="${pageContext.request.contextPath}/board?a=write" id="new-book">글쓰기</a>
+					</div>				
+				</c:if>
 			</div>
 		</div>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp">

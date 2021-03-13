@@ -25,7 +25,7 @@ public class BoardDaoTest {
 		
 		
 		// 게시물 전체 조회 테스트
-//		selectAllTest();
+		selectAllTest();
 //		selectVariableTest();
 
 	}
