@@ -76,7 +76,8 @@ public class BoardDao implements BoardDaoService{
 			pstmt.executeQuery();	
 			pstmt.close();			
 			
-			// 답글 작성시 먼저 수행해야할 구문								
+			// 답글 작성시 먼저 수행해야할 구문
+			// 같은 그룹 에서 원글보다 나중에 달린 글들의 순서를 하나씩 증가시켜서 답글이 달릴 자리(순서)를 확보한다. 
 			sql = "update board "
 					+ "	set order_no = order_no + 1 "
 					+ " where group_no = ? and order_no >= ? + 1;";
@@ -175,19 +176,22 @@ public class BoardDao implements BoardDaoService{
 		}
 		return list;
 	}
+	// 답글이 달린 원 게시글은 삭제하지 않는다.
 	@Override
-	public boolean deleteBoard(Long no) {
+	public boolean deleteBoard(BoardVo vo) {
 		boolean result = false;
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		String sql = "";
 		try {
-			conn = getConnection();
-						
+			conn = getConnection();						
+			
+			// 해당 그룹 내에서 답글이 없는 글(마지막 순서) 만 삭제 가능하다.
 			sql = " delete from board "
-				+ "	where no = ?;";
+					+ "where no = ? and order_no = (select max(order_no) from (select order_no from board where group_no = ?) b) ;";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, no);
+			pstmt.setLong(1, vo.getNo());
+			pstmt.setLong(2, vo.getGroupNo());
 			
 			// 결과가 1이 아닌경우 false return
 			result = 1 == pstmt.executeUpdate();		
@@ -208,8 +212,9 @@ public class BoardDao implements BoardDaoService{
 		}
 		return result;
 	}
-	@Override
-	public BoardVo viewBoard(Long no) {
+	
+	public boolean updateBoardViews(Long no) {
+		boolean result = false;
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -222,8 +227,34 @@ public class BoardDao implements BoardDaoService{
 					+ " where no = ?;";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, no);
-			pstmt.executeUpdate();
-			pstmt.close();
+
+			// 결과가 1이 아닌경우 false return
+			result = 1 == pstmt.executeUpdate();		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}
+				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return result;
+	}
+	@Override
+	public BoardVo getBoard(Long no) {
+		Connection conn = null ;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		BoardVo vo = null;
+		try {
+			conn = getConnection();	
 			
 			// 게시물 전체 내용 가져오기
 			sql =  " select b.no, b.user_no, b.title, b.group_no, b.order_no, "

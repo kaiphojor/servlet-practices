@@ -16,9 +16,11 @@ public interface BoardDaoService {
 	// 게시물 리스팅 (본문 미포함)
 	public List<BoardVo> selectAll();
 	// 게시물 삭제
-	public abstract boolean deleteBoard(Long no);
-	// 게시물 보기 (본문 포함), 조회수 증가
-	public abstract BoardVo viewBoard(Long no);
+	public abstract boolean deleteBoard(BoardVo vo);
+	// 조회수 증가 
+	public boolean updateBoardViews(Long no);
+	// 게시물 가져오기
+	public abstract BoardVo getBoard(Long no);
 	// 게시물 수정 (글, 제목)
 	public abstract boolean updateBoard(BoardVo vo);
 	/*

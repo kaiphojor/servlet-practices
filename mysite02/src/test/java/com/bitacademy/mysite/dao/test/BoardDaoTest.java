@@ -11,7 +11,7 @@ public class BoardDaoTest {
 //		insertBoardTest();
 		
 		// 답글 삽입 테스트
-//		insertBoardReplyTest();
+		insertBoardReplyTest();
 		
 		// 조회수 증가 테스트
 //		viewBoardTest();
@@ -53,10 +53,10 @@ public class BoardDaoTest {
 		}		
 	}
 	public static void insertBoardReplyTest() {
-		BoardVo ori = new BoardDao().viewBoard(3L); 
+		BoardVo ori = new BoardDao().getBoard(6L); 
 		BoardVo vo = new BoardVo(); 
-		Long userNo = 8L;
-		String title = "한번 그래볼까? 같이 ㄱㄱㄱ";
+		Long userNo = 9L;
+		String title = "노가다판도 피튀긴다";
 		String contents = "ㄴㄴㄴ";
 		vo.setUserNo(userNo);
 		vo.setTitle(title);
@@ -64,10 +64,11 @@ public class BoardDaoTest {
 		new BoardDao().insertBoardReply(ori, vo);		
 	}
 	public static void viewBoardTest() {
-		new BoardDao().viewBoard(2L);
+		new BoardDao().getBoard(2L);
 	}
 	public static void deleteBoardTest() {
-		new BoardDao().deleteBoard(4L);
+		BoardVo vo = new BoardDao().getBoard(2L);
+		new BoardDao().deleteBoard(vo);
 	}
 	public static void updateBoardTest() {
 		BoardVo vo = new BoardVo(); 

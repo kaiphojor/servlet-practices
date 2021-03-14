@@ -43,17 +43,9 @@
 							<td>${vo.views }</td>
 							<td>${vo.regDate }</td>
 							<td>
-								<c:choose>
-									<c:when test="${authUser.no == vo.userNo }">
-										<a href="${pageContext.request.contextPath}/board?a=delete&no=${vo.no}" class="del">삭제</a>
-									</c:when>
-									<c:when test="${empty authUser }">
-										<a href="${pageContext.request.contextPath}/board?a=delete&no=${vo.no}" class="del">삭제</a>
-									</c:when>
-									<c:otherwise>
-										<a href="" class="del">로그인함</a>
-									</c:otherwise>
-								</c:choose>
+								<c:if test="${authUser.no == vo.userNo }">
+									<a href="${pageContext.request.contextPath}/board?a=delete&no=${vo.no}" class="del">삭제</a>
+								</c:if>
 							</td>
 <!-- 						</tr>	 -->
 					</c:forEach>				
@@ -74,7 +66,7 @@
 				<!-- pager 추가 -->
 				<c:if test="${not empty authUser}">
 					<div class="bottom">
-						<a href="${pageContext.request.contextPath}/board?a=write" id="new-book">글쓰기</a>
+						<a href="${pageContext.request.contextPath}/board?a=writeform" id="new-book">글쓰기</a>
 					</div>				
 				</c:if>
 			</div>

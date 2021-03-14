@@ -21,6 +21,7 @@ public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		
 		if("joinform".equals(action)) {
@@ -42,8 +43,8 @@ public class UserServlet extends HttpServlet {
 			}
 			
 			Long no = authUser.getNo();
-//			UserVo userVo = new UserDao().findByNo(no);
-			UserVo userVo = new UserVo();
+			UserVo userVo = new UserDao().findByNo(no);
+			
 			request.setAttribute("userVo", userVo);			
 			WebUtil.forward("/WEB-INF/views/user/updateform.jsp", request, response);
 		}else if("logout".equals(action)) {
@@ -64,6 +65,7 @@ public class UserServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("a");
 		if("login".equals(action)) {
 			String email = request.getParameter("email");
@@ -112,6 +114,40 @@ public class UserServlet extends HttpServlet {
 			
 			new UserDao().insert(userVo);
 			WebUtil.redirect(request.getContextPath() + "/user?a=joinsuccess", request, response);
+		}else if("update".equals(action)) {
+			// Access control (접근 제어)
+			HttpSession session = request.getSession();
+			if(session == null){
+				WebUtil.redirect(request.getContextPath(), request, response);
+				return;
+			}
+			
+			UserVo authUser = (UserVo)session.getAttribute("authUser");
+			if(authUser == null) {
+				WebUtil.redirect(request.getContextPath(), request, response);
+				return;				
+			}
+			Long no = Long.parseLong(request.getParameter("no"));			
+			String name = request.getParameter("name");			
+			String email = request.getParameter("email");			
+			String password = request.getParameter("password");		
+			String gender = request.getParameter("gender");		
+			
+						
+			UserVo userVo = new UserDao().findByNo(no);
+			userVo.setName(name);
+			userVo.setEmail(email);
+			userVo.setPassword(password);
+			userVo.setGender(gender);
+			
+			if(new UserDao().update(userVo)) {
+				UserVo authEditedUser = new UserVo();
+				authEditedUser.setNo(no);
+				authEditedUser.setName(name);
+				session.setAttribute("authUser",authEditedUser);
+			}
+
+			WebUtil.redirect(request.getContextPath(), request, response);			
 		}
 	}
 

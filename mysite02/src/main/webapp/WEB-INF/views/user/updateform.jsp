@@ -15,18 +15,19 @@
 		<div id="content">
 			<div id="user">
 
-				<form id="join-form" method="post" action="<%=request.getContextPath() %>/user">
-					<input type='hidden' name='a' value='updateform'/>
+				<form id="join-form" method="post" action="${pageContext.request.contextPath}/user">
+					<input type='hidden' name='a' value='update'/>
+					<input type='hidden' name='no' value='${userVo.no}'/>
 					<label class="block-label" for="name">이름</label>
 					<input id="name" name="name" type="text" value="${userVo.name }">
 
 					<label class="block-label" for="email">이메일</label>
 					<h4>${userVo.email }</h4>
-					<input id="email" name="email" type="text" value="">
+					<input id="email" name="email" type="text" value="${userVo.email }">
 					<input type="button" value="id 중복체크">
 					
 					<label class="block-label">패스워드</label>
-					<input name="password" type="password" value="">
+					<input name="password" type="password" value="${userVo.password }">
 					
 					<fieldset>
 						<legend>성별</legend>

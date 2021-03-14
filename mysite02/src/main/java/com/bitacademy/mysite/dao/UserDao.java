@@ -55,6 +55,53 @@ public class UserDao {
 		}
 		return userVo;
 	}
+	// no가 일치하는 user를 가져온다. 
+	public UserVo findByNo(Long no) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		UserVo userVo = null;
+		ResultSet rs = null;
+		try {
+			conn = getConnection();
+			String sql =  "select name, email, password, gender "
+					+ "	from user "
+					+ "	where no = ?;";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, no);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				String name = rs.getString(1);
+				String email = rs.getString(2);
+				String password = rs.getString(3);
+				String gender = rs.getString(4);
+				userVo = new UserVo(); 
+				userVo.setNo(no);
+				userVo.setName(name);
+				userVo.setEmail(email);
+				userVo.setPassword(password);
+				userVo.setGender(gender);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(rs != null) {
+					rs.close();
+				}
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return userVo;
+	}
 	// 사용자 추가
 	public boolean insert(UserVo vo) {
 		boolean result = false;
@@ -92,7 +139,46 @@ public class UserDao {
 
 		return result;
 	}
-	
+
+	// 사용자 정보 수정 
+	public boolean update(UserVo vo) {
+		boolean result = false;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = getConnection();
+			String sql =  "update user "
+					+ "	set name = ?, email = ?, password = ?, gender = ? "
+					+ "	where no = ?;";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, vo.getName());
+			pstmt.setString(2, vo.getEmail());
+			pstmt.setString(3, vo.getPassword());
+			pstmt.setString(4, vo.getGender());
+			pstmt.setLong(5, vo.getNo());
+			
+			// 결과가 1이 아닌경우 false return
+			result = 1 == pstmt.executeUpdate();
+
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+
+		return result;
+	}
 	public boolean select(UserVo vo) {
 		boolean result = false;
 		Connection conn = null;
