@@ -5,7 +5,7 @@
 	pageEncoding="UTF-8"%>
 <div id="navigation">
 	<ul>
-		<li><a href="${pageContext.request.contextPath}">개발자 지망생</a></li>
+		<li><a href="${pageContext.request.contextPath}">지망생 박지후</a></li>
 		<li><a href="${pageContext.request.contextPath}/guestbook">방명록</a></li>
 		<li><a href="${pageContext.request.contextPath}/board">게시판</a></li>
 	</ul>

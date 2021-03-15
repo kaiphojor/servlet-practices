@@ -21,7 +21,6 @@ import com.bitacademy.web.mvc.WebUtil;
 public class BoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");		
 		String action = request.getParameter("a");
 		
 		// 글쓰기 페이지 
@@ -38,7 +37,7 @@ public class BoardServlet extends HttpServlet {
 			String content = request.getParameter("content");
 			BoardVo vo = new BoardVo();
 			vo.setUserNo(userNo);
-			vo.setTitle(title);
+			vo.setTitle(title); 
 			vo.setContents(content);
 
 			new BoardDao().insertBoard(vo);
