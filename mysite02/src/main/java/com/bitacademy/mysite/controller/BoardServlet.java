@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.bitacademy.mysite.dao.BoardDao;
 import com.bitacademy.mysite.vo.BoardVo;
 import com.bitacademy.web.mvc.WebUtil;
+import com.bitacemy.mysite.pagination.PagingBean;
 
 /**
  * Servlet implementation class BoardServlet
@@ -98,8 +99,18 @@ public class BoardServlet extends HttpServlet {
 				out.flush();
 			}
 		}else {
-			List<BoardVo> list = new BoardDao().selectAll();
+			int totalCount = new BoardDao().selectBoardListCnt();
+			String pageNo = request.getParameter("page");
+			PagingBean pagingBean = null;			
+			if(pageNo == null) {
+				pagingBean = new PagingBean(totalCount);
+			}else {
+				pagingBean = new PagingBean(totalCount, Integer.parseInt(pageNo)); 
+			}
+			List<BoardVo> list = new BoardDao().getBoardPageList(pagingBean);
 			request.setAttribute("list", list);
+			request.setAttribute("pagingBean", pagingBean);
+			
 			WebUtil.forward("/WEB-INF/views/board/index.jsp", request, response);			
 		}
 	}

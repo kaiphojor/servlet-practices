@@ -28,9 +28,10 @@
 						<th>&nbsp;</th>
 					</tr>
 					<c:set var="count" value="${fn:length(list)}"/>
+					
 					<c:forEach items="${list}" var="vo" varStatus="status">
 						<tr>
-							<td>${count - status.index}</td>
+							<td>${count-status.index+pagingBean.lastIndexOfNextPage}</td>
 							<td style="text-align:Left; padding-left:${(vo.depth-1)*40}">
 								<a href="${pageContext.request.contextPath}/board?a=view&no=${vo.no}" >
 								<c:if test="${vo.depth > 0 }">
@@ -47,20 +48,30 @@
 									<a href="${pageContext.request.contextPath}/board?a=delete&no=${vo.no}" class="del">삭제</a>
 								</c:if>
 							</td>
-<!-- 						</tr>	 -->
+ 						</tr>	
 					</c:forEach>				
 				</table>
-				
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
-						<li><a href="">◀</a></li>
-						<li><a href="">1</a></li>
-						<li class="selected">2</li>
-						<li><a href="">3</a></li>
-						<li>4</li>
-						<li>5</li>
-						<li><a href="">▶</a></li>
+				        <c:if test="${pagingBean.previousPageGroup == true}">
+				            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.startPageOfPageGroup -1 }">◀</a>
+				        </c:if>
+				        <c:forEach var="page" begin="${pagingBean.startPageOfPageGroup}" end="${pagingBean.endPageOfPageGroup}" varStatus="order">
+				        	<c:choose>
+				        		<c:when test="${order.index == pagingBean.nowPage }">
+				        			<li class="selected">
+				        		</c:when>
+				        		<c:otherwise>
+				        			<li>
+				        		</c:otherwise>
+				        	</c:choose>
+				        		<a href="${pageContext.request.contextPath}/board?page=${order.index}">${order.index}</a>
+				        	</li>
+				        </c:forEach>
+				        <c:if test="${pagingBean.nextPageGroup == true}">
+				            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.endPageOfPageGroup +1 }">▶</a>
+				        </c:if>
 					</ul>
 				</div>					
 				<!-- pager 추가 -->

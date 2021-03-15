@@ -4,11 +4,14 @@ import java.util.List;
 
 import com.bitacademy.mysite.dao.BoardDao;
 import com.bitacademy.mysite.vo.BoardVo;
+import com.bitacemy.mysite.pagination.PagingBean;
 
 public class BoardDaoTest {
 	public static void main(String[] args) {
 		// 게시물 삽입 테스트
-//		insertBoardTest();
+		for(int i=0 ; i< 100 ;i++) {
+			insertBoardTest(i);			
+		}
 		
 		// 답글 삽입 테스트
 //		insertBoardReplyTest();
@@ -35,11 +38,11 @@ public class BoardDaoTest {
 //		new BoardDao().setSqlSafeUpdates(true);
 //		new BoardDao().selectVariable(); 
 	}
-	public static void insertBoardTest() {
+	public static void insertBoardTest(int no) {
 		BoardVo vo = new BoardVo();
 		Long userNo = 2L;
-		String title = "테스트 타이틀";
-		String contents = "asdfasdf \n정ㄹㄴㅇㄹ?";
+		String title = "테스트 타이틀 " + no;
+		String contents = "test contents " + no;
 		vo.setUserNo(userNo);
 		vo.setTitle(title);
 		vo.setContents(contents);
@@ -47,7 +50,13 @@ public class BoardDaoTest {
 	}
 	
 	public static void selectAllTest() {
-		List<BoardVo> list = new BoardDao().selectAll();
+		int totalCount = new BoardDao().selectBoardListCnt();
+		String pageNo = null;
+		PagingBean pagingBean = null;			
+		if(pageNo == null) {
+			pagingBean = new PagingBean(totalCount);
+		}
+		List<BoardVo> list = new BoardDao().getBoardPageList(pagingBean);
 		for(BoardVo vo : list) {
 			System.out.println(vo);
 		}		

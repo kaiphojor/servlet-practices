@@ -5,8 +5,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.bitacademy.mysite.vo.BoardVo;
+import com.bitacemy.mysite.pagination.PagingBean;
 // BoardDao interface
-public interface BoardDaoService {
+public interface IBoardDao {
 	// 연결
 	public Connection getConnection()  throws SQLException;
 	// 게시물 생성 
@@ -14,7 +15,7 @@ public interface BoardDaoService {
 	// 답글 생성
 	public boolean insertBoardReply(BoardVo originVo, BoardVo vo);
 	// 게시물 리스팅 (본문 미포함)
-	public List<BoardVo> selectAll();
+	public List<BoardVo> getBoardPageList(PagingBean pagingBean);
 	// 게시물 삭제
 	public abstract boolean deleteBoard(BoardVo vo);
 	// 조회수 증가 
@@ -32,7 +33,6 @@ public interface BoardDaoService {
 	public abstract List<BoardVo> searchBoardByTitle(String title);
 	public abstract List<BoardVo> searchBoardByTitleContents(String titleContents);
 	// paging
-	public abstract List<BoardVo> selectPage(int pageNum);
 	public abstract int selectBoardListCnt();
 	
 }

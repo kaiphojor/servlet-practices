@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bitacademy.mysite.vo.BoardVo;
+import com.bitacemy.mysite.pagination.PagingBean;
 
-public class BoardDao implements BoardDaoService{
+public class BoardDao implements IBoardDao{
 	public Connection getConnection() throws SQLException {
 		Connection conn = null;
 		try {
@@ -120,11 +121,12 @@ public class BoardDao implements BoardDaoService{
 		return result;
 	}
 	// 게시물 리스팅(게시판)
-	public List<BoardVo> selectAll(){
+	public List<BoardVo> getBoardPageList(PagingBean pagingBean){
 		List<BoardVo> list = new ArrayList<BoardVo>();
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
-		String sql = null;
+		String sql = null;	
+		
 		try {
 			conn = getConnection();
 			//
@@ -140,9 +142,12 @@ public class BoardDao implements BoardDaoService{
 					+ "	from board b "
 					+ " join user u "
 					+ " on b.user_no = u.no "
-					+ "	order by group_no DESC, order_no ASC;";
+					+ "	order by group_no DESC, order_no ASC"
+					+ " LIMIT ?, ? ;";
 			
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, pagingBean.getStartRowNumber()-1);
+			pstmt.setInt(2, pagingBean.getEndRowNumber() - pagingBean.getStartRowNumber()+1);
 			
 			ResultSet rs = pstmt.executeQuery();
 			while(rs.next()) {
@@ -349,11 +354,6 @@ public class BoardDao implements BoardDaoService{
 	}
 	@Override
 	public List<BoardVo> searchBoardByTitleContents(String titleContents) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public List<BoardVo> selectPage(int pageNum) {
 		// TODO Auto-generated method stub
 		return null;
 	}
