@@ -357,8 +357,43 @@ public class BoardDao implements BoardDaoService{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	
-	
-
+	@Override
+	public int selectBoardListCnt() {
+//		https://gangnam-americano.tistory.com/18
+		Connection conn = null ;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int result = 0;
+		try {
+			conn = getConnection();	
+			
+			// 게시물 전체 내용 가져오기
+			sql =  " select count(no) "
+					+ "	from board;";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}
+				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return result;
+	}
 }

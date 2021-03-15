@@ -4,7 +4,7 @@ CREATE TABLE `user` (
 	`name`      VARCHAR(50)            NOT NULL COMMENT '이름', -- 이름
 	`email`     VARCHAR(200)           NOT NULL COMMENT '이메일', -- 이메일
 	`password`  VARCHAR(20)            NOT NULL COMMENT '비밀번호', -- 비밀번호
-	`gender`    ENUM('maile','female') NOT NULL COMMENT '성별', -- 성별
+	`gender`    ENUM('male','female') NOT NULL COMMENT '성별', -- 성별
 	`join_date` DATETIME               NOT NULL COMMENT '가입일' -- 가입일
 )
 COMMENT '회원';

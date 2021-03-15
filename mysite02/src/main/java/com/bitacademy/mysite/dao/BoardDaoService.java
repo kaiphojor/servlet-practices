@@ -33,5 +33,6 @@ public interface BoardDaoService {
 	public abstract List<BoardVo> searchBoardByTitleContents(String titleContents);
 	// paging
 	public abstract List<BoardVo> selectPage(int pageNum);
+	public abstract int selectBoardListCnt();
 	
 }

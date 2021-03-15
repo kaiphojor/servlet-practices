@@ -11,7 +11,7 @@ public class BoardDaoTest {
 //		insertBoardTest();
 		
 		// 답글 삽입 테스트
-		insertBoardReplyTest();
+//		insertBoardReplyTest();
 		
 		// 조회수 증가 테스트
 //		viewBoardTest();
@@ -38,8 +38,8 @@ public class BoardDaoTest {
 	public static void insertBoardTest() {
 		BoardVo vo = new BoardVo();
 		Long userNo = 2L;
-		String title = "삶이 질린다";
-		String contents = "무엇을 해야 \n행복할 수 있을까?";
+		String title = "테스트 타이틀";
+		String contents = "asdfasdf \n정ㄹㄴㅇㄹ?";
 		vo.setUserNo(userNo);
 		vo.setTitle(title);
 		vo.setContents(contents);
