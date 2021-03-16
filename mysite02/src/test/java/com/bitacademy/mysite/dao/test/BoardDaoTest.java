@@ -9,10 +9,10 @@ import com.bitacemy.mysite.pagination.PagingBean;
 public class BoardDaoTest {
 	public static void main(String[] args) {
 		// 게시물 삽입 테스트
-		for(int i=0 ; i< 100 ;i++) {
-			insertBoardTest(i);			
-		}
-		
+//		for(int i=0 ; i< 100 ;i++) {
+//			insertBoardTest(i);			
+//		}
+//		
 		// 답글 삽입 테스트
 //		insertBoardReplyTest();
 		
@@ -28,10 +28,28 @@ public class BoardDaoTest {
 		
 		
 		// 게시물 전체 조회 테스트
-		selectAllTest();
+//		selectAllTest();
+		
+		// 제목 검색 조회 테스트
+		searchBoardListByTitleTest("user","jinsa");
+		
 //		selectVariableTest();
 
 	}
+	public static void searchBoardListByTitleTest(String column, String keyword) {
+		int totalCount = new BoardDao().selectBoardListCnt(column,keyword);
+		System.out.println(totalCount);
+		String pageNo = null;
+		PagingBean pagingBean = null;
+		if(pageNo == null) {
+			pagingBean = new PagingBean(totalCount);
+		}
+		List<BoardVo> list = new BoardDao().searchBoardListByKeyword(pagingBean,column,keyword);
+		for(BoardVo vo : list) {
+			System.out.println(vo);
+		}
+	}
+	
 	public static void selectVariableTest() {
 //		new BoardDao().setSqlSafeUpdates(false);
 //		new BoardDao().selectVariable(); 

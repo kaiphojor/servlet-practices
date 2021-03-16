@@ -2,6 +2,7 @@ package com.bitacademy.mysite.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -99,7 +100,17 @@ public class BoardServlet extends HttpServlet {
 				out.flush();
 			}
 		}else {
-			int totalCount = new BoardDao().selectBoardListCnt();
+			// 검색어가 존재하면 utf-8으로 decoding 한 후 검색 결과를 보여준다.
+			String keyword = request.getParameter("kwd");
+			int totalCount;
+			List<BoardVo> list;
+			
+			if(keyword == null) {
+				totalCount = new BoardDao().selectBoardListCnt();			
+			}else{
+				keyword = URLDecoder.decode(keyword,"UTF-8");
+				totalCount = new BoardDao().selectBoardListCnt("title",keyword);
+			}
 			String pageNo = request.getParameter("page");
 			PagingBean pagingBean = null;			
 			if(pageNo == null) {
@@ -107,7 +118,14 @@ public class BoardServlet extends HttpServlet {
 			}else {
 				pagingBean = new PagingBean(totalCount, Integer.parseInt(pageNo)); 
 			}
-			List<BoardVo> list = new BoardDao().getBoardPageList(pagingBean);
+			// 검색어 유무에 관련없이 paging 처리해서 목록을 출력한다. 
+			if(keyword== null) {
+				list = new BoardDao().getBoardPageList(pagingBean);				
+			}else {
+				list = new BoardDao().searchBoardListByKeyword(pagingBean,"title",keyword);
+				request.setAttribute("keyword", keyword);
+			}
+			
 			request.setAttribute("list", list);
 			request.setAttribute("pagingBean", pagingBean);
 			

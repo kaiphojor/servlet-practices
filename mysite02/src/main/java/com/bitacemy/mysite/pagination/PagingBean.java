@@ -12,6 +12,9 @@ public class PagingBean {
    
    //    현재 db에 저장된 총 게시물 수
    private int totalContents;
+   
+
+   
    public PagingBean(){}
 
    //    총게시물수를 할당
@@ -24,7 +27,8 @@ public class PagingBean {
        this.totalContents = totalContents;
        this.nowPage = nowPage;
    }
-   // 현재 페이지 리턴
+
+// 현재 페이지 리턴
    public int getNowPage() {
        return nowPage;
    }

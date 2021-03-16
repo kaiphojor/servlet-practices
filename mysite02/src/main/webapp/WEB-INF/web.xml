@@ -22,5 +22,18 @@
   	<servlet-name>MainServlet</servlet-name>
   	<url-pattern></url-pattern>
   </servlet-mapping>
+	<jsp-config>
+	
+		<taglib>
+	
+			<taglib-uri>http://enchiridion.tistory.com/jsp/encode</taglib-uri>
+	
+			<taglib-location>/WEB-INF/tlds/encode.tld</taglib-location>
+	
+		</taglib>
+	
+	</jsp-config>
+
+
 
 </web-app>

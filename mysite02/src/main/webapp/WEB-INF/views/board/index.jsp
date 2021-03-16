@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>  
+<%@ taglib uri="http://enchiridion.tistory.com/jsp/encode" prefix="encode" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -14,8 +15,18 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp"/>
 		<div id="content">
 			<div id="board">
-				<form id="search_form" action="" method="post">
-					<input type="text" id="kwd" name="kwd" value="">
+				<form id="search_form" action="${pageContext.request.contextPath}/board" method="post">
+					<c:choose>
+						<c:when test="${empty keyword}">
+							<input type="text" id="kwd" name="kwd" value="">
+						</c:when>
+						<c:otherwise>
+							<input type="text" id="kwd" name="kwd" value="${keyword}">
+						</c:otherwise>
+					</c:choose>
+					
+					
+					
 					<input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
@@ -54,24 +65,54 @@
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
-				        <c:if test="${pagingBean.previousPageGroup == true}">
+					<c:choose>
+						<c:when test="${empty keyword}">
+					        <c:if test="${pagingBean.previousPageGroup == true}">
 				            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.startPageOfPageGroup -1 }">◀</a>
-				        </c:if>
-				        <c:forEach var="page" begin="${pagingBean.startPageOfPageGroup}" end="${pagingBean.endPageOfPageGroup}" varStatus="order">
-				        	<c:choose>
-				        		<c:when test="${order.index == pagingBean.nowPage }">
-				        			<li class="selected">
-				        		</c:when>
-				        		<c:otherwise>
-				        			<li>
-				        		</c:otherwise>
-				        	</c:choose>
-				        		<a href="${pageContext.request.contextPath}/board?page=${order.index}">${order.index}</a>
-				        	</li>
-				        </c:forEach>
-				        <c:if test="${pagingBean.nextPageGroup == true}">
+					        </c:if>
+						        <c:forEach var="page" begin="${pagingBean.startPageOfPageGroup}" end="${pagingBean.endPageOfPageGroup}" varStatus="order">
+						        	<c:choose>
+						        		<c:when test="${order.index == pagingBean.nowPage }">
+						        			<li class="selected">
+						        		</c:when>
+						        		<c:otherwise>
+						        			<li>
+						        		</c:otherwise>
+						        	</c:choose>
+						        		<a href="${pageContext.request.contextPath}/board?page=${order.index}">${order.index}</a>
+						        	</li>
+						        </c:forEach>
+					        <c:if test="${pagingBean.nextPageGroup == true}">
 				            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.endPageOfPageGroup +1 }">▶</a>
 				        </c:if>
+						</c:when>
+						
+						<c:otherwise>
+							<c:set var="encodedKeyword" value='${encode:urlEncode(keyword,"utf-8")}'/>
+					        <c:if test="${pagingBean.previousPageGroup == true}">
+					            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.startPageOfPageGroup -1 }&kwd=${encodedKeyword}">◀</a>
+					        </c:if>
+					        <c:forEach var="page" begin="${pagingBean.startPageOfPageGroup}" end="${pagingBean.endPageOfPageGroup}" varStatus="order">
+					        	<c:choose>
+					        		<c:when test="${order.index == pagingBean.nowPage }">
+					        			<li class="selected">
+					        		</c:when>
+					        		<c:otherwise>
+					        			<li>
+					        		</c:otherwise>
+					        	</c:choose>
+					        		<a href='${pageContext.request.contextPath}/board?page=${order.index}&kwd=${encodedKeyword}'>${order.index}</a>
+					        	</li>
+					        </c:forEach>
+					        <c:if test="${pagingBean.nextPageGroup == true}">
+					            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.endPageOfPageGroup +1 }&kwd=${encodedKeyword}">▶</a>
+					        </c:if>
+						</c:otherwise>
+					</c:choose>
+					
+					
+					
+
 					</ul>
 				</div>					
 				<!-- pager 추가 -->

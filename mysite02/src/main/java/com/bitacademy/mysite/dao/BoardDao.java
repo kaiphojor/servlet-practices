@@ -136,12 +136,12 @@ public class BoardDao implements IBoardDao{
 			pstmt.executeQuery();	
 			pstmt.close();
 			
-			
+						
 			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
 					+ " date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views, u.name "
 					+ "	from board b "
 					+ " join user u "
-					+ " on b.user_no = u.no "
+					+ " on b.user_no = u.no "					
 					+ "	order by group_no DESC, order_no ASC"
 					+ " LIMIT ?, ? ;";
 			
@@ -338,25 +338,74 @@ public class BoardDao implements IBoardDao{
 		return result;
 	}
 	@Override
-	public List<BoardVo> searchBoardByName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<BoardVo> searchBoardListByKeyword(PagingBean pagingBean, String column, String keyword){
+		List<BoardVo> list = new ArrayList<BoardVo>();
+		Connection conn = null ;
+		PreparedStatement pstmt = null;
+		String sql = null;	
+		
+		try {
+			conn = getConnection();
+			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
+			sql =  "set sql_safe_updates=0;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.executeQuery();	
+			pstmt.close();
+			
+			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
+					+ " date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views, u.name "
+					+ "	from board b "
+					+ " join user u "
+					+ " on b.user_no = u.no "; 
+			// column 입력 값 별 질의문 차별화
+			if("user".equals(column)) {
+				sql += " and u.name like ? ";
+			}else if("title".equals(column)) {
+				sql += " and b.title like concat('%',?,'%') ";
+			}else if("contents".equals(column)) {
+				sql += " and b.contents like concat('%',?,'%') ";
+			}else {
+				sql += " and b.title like concat('%',?,'%') ";
+			}
+			sql += "	order by group_no DESC, order_no ASC"
+					+ " LIMIT ?, ? ;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, keyword);
+			pstmt.setInt(2, pagingBean.getStartRowNumber()-1);
+			pstmt.setInt(3, pagingBean.getEndRowNumber() - pagingBean.getStartRowNumber()+1);				
+			
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				BoardVo vo = new BoardVo();
+				vo.setNo(rs.getLong(1));
+				vo.setUserNo(rs.getLong(2));
+				vo.setTitle(rs.getString(3));
+				vo.setGroupNo(rs.getLong(4));
+				vo.setOrderNo(rs.getLong(5));
+				vo.setDepth(rs.getLong(6));
+				vo.setRegDate(rs.getString(7));
+				vo.setViews(rs.getLong(8));
+				vo.setUserName(rs.getString(9));
+				list.add(vo);
+			}			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}
+				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return list;
 	}
-	@Override
-	public List<BoardVo> searchBoardByContents(String contents) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public List<BoardVo> searchBoardByTitle(String title) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public List<BoardVo> searchBoardByTitleContents(String titleContents) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	@Override
 	public int selectBoardListCnt() {
 //		https://gangnam-americano.tistory.com/18
@@ -373,6 +422,54 @@ public class BoardDao implements IBoardDao{
 			
 			pstmt = conn.prepareStatement(sql);
 			
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}
+				
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return result;
+	}
+	// 검색어 조건에 맞는 게시글 수를 가져온다. 
+	@Override
+	public int selectBoardListCnt(String column, String keyword) {
+		// TODO Auto-generated method stub
+		Connection conn = null ;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		int result = 0;
+		try {
+			conn = getConnection();	
+			
+			// 게시물 전체 내용 가져오기
+			sql =  " select count(1) "
+					+ "	from board "; 
+			if("title".equals(column)){
+				sql += " where title like concat('%',?,'%');";				
+			}else if("contents".equals(column)) {
+				sql += " where contents like concat('%',?,'%');";				
+			}else if("user".equals(column)) {
+				sql += " b join user u on b.user_no = u.no "
+					+ " and u.name like ?;";
+			}
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, keyword);
 			ResultSet rs = pstmt.executeQuery();
 			if(rs.next()) {
 				result = rs.getInt(1);

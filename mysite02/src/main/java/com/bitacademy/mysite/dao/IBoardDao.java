@@ -28,11 +28,10 @@ public interface IBoardDao {
 	 *  additional
 	 */
 	// search by name, contents, name + contents
-	public abstract List<BoardVo> searchBoardByName(String name);
-	public abstract List<BoardVo> searchBoardByContents(String contents);
-	public abstract List<BoardVo> searchBoardByTitle(String title);
-	public abstract List<BoardVo> searchBoardByTitleContents(String titleContents);
-	// paging
+	public abstract List<BoardVo> searchBoardListByKeyword(PagingBean pagingBean, String column, String keyword);
+	// 총 게시글 수 가져오기 
 	public abstract int selectBoardListCnt();
+	// 검색어 조건에 맞는 게시글 수를 가져온다. 
+	public abstract int selectBoardListCnt(String column, String keyword);
 	
 }
