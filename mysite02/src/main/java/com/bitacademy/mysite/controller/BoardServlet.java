@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.bitacademy.mysite.dao.BoardDao;
+import com.bitacademy.mysite.pagination.PagingBean;
 import com.bitacademy.mysite.vo.BoardVo;
 import com.bitacademy.web.mvc.WebUtil;
-import com.bitacemy.mysite.pagination.PagingBean;
 
 /**
  * Servlet implementation class BoardServlet

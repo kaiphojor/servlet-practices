@@ -24,3 +24,15 @@
 
 * docs/user_DDL.sql , docs/guestbook_DDL.sql , docs/board_DDL.sql  - DB 순차 생성
 * 
+```
+DB의 password 암호화
+
+답글있는 글의 삭제된 글입니다. 이것은 어덯게 ㅍ현하는가? 
+
+readme 수정 -> DB 테이블 
+
+## prerequisite
+
+make user table
+```
+```

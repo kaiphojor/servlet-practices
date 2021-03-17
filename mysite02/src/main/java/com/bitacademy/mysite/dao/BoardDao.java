@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bitacademy.mysite.pagination.PagingBean;
 import com.bitacademy.mysite.vo.BoardVo;
-import com.bitacemy.mysite.pagination.PagingBean;
 
 public class BoardDao implements IBoardDao{
 	public Connection getConnection() throws SQLException {

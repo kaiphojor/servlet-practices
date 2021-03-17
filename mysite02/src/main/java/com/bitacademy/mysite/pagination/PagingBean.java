@@ -1,4 +1,4 @@
-package com.bitacemy.mysite.pagination;
+package com.bitacademy.mysite.pagination;
 
 public class PagingBean {
 	// 현재 페이지

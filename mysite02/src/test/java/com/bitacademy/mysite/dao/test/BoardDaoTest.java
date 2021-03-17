@@ -3,15 +3,15 @@ package com.bitacademy.mysite.dao.test;
 import java.util.List;
 
 import com.bitacademy.mysite.dao.BoardDao;
+import com.bitacademy.mysite.pagination.PagingBean;
 import com.bitacademy.mysite.vo.BoardVo;
-import com.bitacemy.mysite.pagination.PagingBean;
 
 public class BoardDaoTest {
 	public static void main(String[] args) {
 		// 게시물 삽입 테스트
-//		for(int i=0 ; i< 100 ;i++) {
-//			insertBoardTest(i);			
-//		}
+		for(int i=0 ; i< 100 ;i++) {
+			insertBoardTest(i);			
+		}
 //		
 		// 답글 삽입 테스트
 //		insertBoardReplyTest();
@@ -28,10 +28,10 @@ public class BoardDaoTest {
 		
 		
 		// 게시물 전체 조회 테스트
-//		selectAllTest();
+		selectAllTest();
 		
 		// 제목 검색 조회 테스트
-		searchBoardListByTitleTest("user","jinsa");
+//		searchBoardListByTitleTest("user","jinsa");
 		
 //		selectVariableTest();
 

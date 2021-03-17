@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.bitacademy.mysite.pagination.PagingBean;
 import com.bitacademy.mysite.vo.BoardVo;
-import com.bitacemy.mysite.pagination.PagingBean;
 // BoardDao interface
 public interface IBoardDao {
 	// 연결
