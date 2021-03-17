@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bitacademy.mysite.vo.GuestbookVo;
 /*
@@ -26,6 +28,28 @@ public class GuestbookDao {
 		}		
 		return conn;
 	}
+	// db 복제를 위한 getConnection
+	public Connection getConnection(String dbName) throws SQLException {
+		// connection map
+		Map<String, Integer> portMap = new HashMap<>();
+		portMap.put("master", 3307);
+		portMap.put("slave1", 3308);
+//		portMap.put("slave2", 3309);
+//		portMap.put("slave3", 3310);
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:"+portMap.get(dbName)+"/webdb?characterEncoding=utf8&serverTimezone=UTC";
+			if("master".equals(dbName)) {
+				conn = DriverManager.getConnection(url, "root", "masterpw");
+			}else{
+				conn = DriverManager.getConnection(url, "root", "slavepw");
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("error " + e);
+		}
+		return conn;
+	}
 	// 방명록 추가
 	public boolean insert(GuestbookVo vo) {
 		List<GuestbookVo> list = new ArrayList<GuestbookVo>();
@@ -33,7 +57,8 @@ public class GuestbookDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("master");
 			String sql =  "insert "
 					+ "	into guestbook "
 					+ "	values(null,?,?,?,now());";
@@ -69,7 +94,8 @@ public class GuestbookDao {
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name,  date_format(reg_date,'%Y-%m-%d %H:%i:%s'),contents "
 					+ "	from guestbook "
 					+ "	order by reg_date desc;";
@@ -110,7 +136,8 @@ public class GuestbookDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("master");
 			String sql =  "delete from guestbook "
 					+ "	where no = ? and password = ?;";
 			

@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bitacademy.mysite.vo.GuestbookVo;
 import com.bitacademy.mysite.vo.UserVo;
@@ -19,7 +21,8 @@ public class UserDao {
 		UserVo userVo = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name  "
 					+ "	from user "
 					+ "	where email=? and password=?;";
@@ -62,7 +65,8 @@ public class UserDao {
 		UserVo userVo = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select name, email, password, gender "
 					+ "	from user "
 					+ "	where no = ?;";
@@ -108,7 +112,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("master");
 			String sql =  "insert "
 					+ "	into user "
 					+ "	values(null,?,?,?,?,now());";
@@ -146,7 +151,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("master");
 			String sql =  "update user "
 					+ "	set name = ?, email = ?, password = ?, gender = ? "
 					+ "	where no = ?;";
@@ -184,7 +190,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name  "
 					+ "	from user "
 					+ "	where email=? and password=?;";
@@ -226,6 +233,30 @@ public class UserDao {
 		}		
 		return conn;
 	}
+	
+	// db 복제를 위한 getConnection
+	public Connection getConnection(String dbName) throws SQLException {
+		// connection map
+		Map<String, Integer> portMap = new HashMap<>();
+		portMap.put("master", 3307);
+		portMap.put("slave1", 3308);
+		portMap.put("slave2", 3309);
+		portMap.put("slave3", 3310);
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:"+portMap.get(dbName)+"/webdb?characterEncoding=utf8&serverTimezone=UTC";
+			if("master".equals(dbName)) {
+				conn = DriverManager.getConnection(url, "root", "masterpw");
+			}else{
+				conn = DriverManager.getConnection(url, "root", "slavepw");
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("error " + e);
+		}
+		return conn;
+	}
+	
 
 	// 전체 방명록 조회, 날짜는 sql에서 String format 반환됨
 	public List<GuestbookVo> selectAll() {
@@ -233,7 +264,8 @@ public class UserDao {
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name,  date_format(reg_date,'%Y-%m-%d %H:%i:%s'),contents "
 					+ "	from guestbook "
 					+ "	order by reg_date desc;";
@@ -274,7 +306,8 @@ public class UserDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-			conn = getConnection();
+//			conn = getConnection(); 
+			conn = getConnection("master"); 
 			String sql =  "delete from guestbook "
 					+ "	where no = ? and password = ?;";
 			
