@@ -57,8 +57,8 @@ public class GuestbookDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-//			conn = getConnection();
-			conn = getConnection("master");
+			conn = getConnection();
+//			conn = getConnection("master");
 			String sql =  "insert "
 					+ "	into guestbook "
 					+ "	values(null,?,?,?,now());";
@@ -94,8 +94,8 @@ public class GuestbookDao {
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("slave1");
+			conn = getConnection();
+//			conn = getConnection("slave1");
 			String sql =  "select no, name,  date_format(reg_date,'%Y-%m-%d %H:%i:%s'),contents "
 					+ "	from guestbook "
 					+ "	order by reg_date desc;";
@@ -136,8 +136,8 @@ public class GuestbookDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-//			conn = getConnection();
-			conn = getConnection("master");
+			conn = getConnection();
+//			conn = getConnection("master");
 			String sql =  "delete from guestbook "
 					+ "	where no = ? and password = ?;";
 			

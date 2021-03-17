@@ -21,8 +21,8 @@ public class UserDao {
 		UserVo userVo = null;
 		ResultSet rs = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("slave1");
+			conn = getConnection();
+//			conn = getConnection("slave1");
 			String sql =  "select no, name  "
 					+ "	from user "
 					+ "	where email=? and password=?;";
@@ -65,8 +65,8 @@ public class UserDao {
 		UserVo userVo = null;
 		ResultSet rs = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("slave1");
+			conn = getConnection();
+//			conn = getConnection("slave1");
 			String sql =  "select name, email, password, gender "
 					+ "	from user "
 					+ "	where no = ?;";
@@ -112,8 +112,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("master");
+			conn = getConnection();
+//			conn = getConnection("master");
 			String sql =  "insert "
 					+ "	into user "
 					+ "	values(null,?,?,?,?,now());";
@@ -151,8 +151,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("master");
+			conn = getConnection();
+//			conn = getConnection("master");
 			String sql =  "update user "
 					+ "	set name = ?, email = ?, password = ?, gender = ? "
 					+ "	where no = ?;";
@@ -190,8 +190,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("slave1");
+			conn = getConnection();
+//			conn = getConnection("slave1");
 			String sql =  "select no, name  "
 					+ "	from user "
 					+ "	where email=? and password=?;";
@@ -264,8 +264,8 @@ public class UserDao {
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		try {
-//			conn = getConnection();
-			conn = getConnection("slave1");
+			conn = getConnection();
+//			conn = getConnection("slave1");
 			String sql =  "select no, name,  date_format(reg_date,'%Y-%m-%d %H:%i:%s'),contents "
 					+ "	from guestbook "
 					+ "	order by reg_date desc;";
@@ -306,8 +306,8 @@ public class UserDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-//			conn = getConnection(); 
-			conn = getConnection("master"); 
+			conn = getConnection(); 
+//			conn = getConnection("master"); 
 			String sql =  "delete from guestbook "
 					+ "	where no = ? and password = ?;";
 			
