@@ -120,18 +120,19 @@ ALTER TABLE `board`
 
 # DB 이중화(replication)
 
+* 결과 LINK - https://enchiridion.tistory.com/63
+
 ![db_replication_architecture](./db_replication.png)
 
 * 상세 - DB 이중화를 통한 부하 분산
   * docker container 사용해서 mysql master db, slave db를 생성, 이중화 
   * master 에서는 insert, update, delete 수행
   * slave에서는 select만  수행
-* link - 
+
 * 적용된 commit
   * https://github.com/kaiphojor/servlet-practices/commit/866ae6742a490f201479325407dc9edca10c4af6
 
 * 참고
-
   * https://jupiny.com/2017/11/07/docker-mysql-replicaiton/
 
   
