@@ -16,6 +16,11 @@
 		<div id="content">
 			<div id="board">
 				<form id="search_form" action="${pageContext.request.contextPath}/board" method="post">
+					<select name="category" id="category">
+					  <option value="title">제목</option>
+					  <option value="contents">내용</option>
+					  <option value="user">사용자</option>
+					</select>
 					<c:choose>
 						<c:when test="${empty keyword}">
 							<input type="text" id="kwd" name="kwd" value="">
@@ -90,7 +95,7 @@
 						<c:otherwise>
 							<c:set var="encodedKeyword" value='${encode:urlEncode(keyword,"utf-8")}'/>
 					        <c:if test="${pagingBean.previousPageGroup == true}">
-					            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.startPageOfPageGroup -1 }&kwd=${encodedKeyword}">◀</a>
+					            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.startPageOfPageGroup -1 }&category=${category}&kwd=${encodedKeyword}">◀</a>
 					        </c:if>
 					        <c:forEach var="page" begin="${pagingBean.startPageOfPageGroup}" end="${pagingBean.endPageOfPageGroup}" varStatus="order">
 					        	<c:choose>
@@ -101,11 +106,11 @@
 					        			<li>
 					        		</c:otherwise>
 					        	</c:choose>
-					        		<a href='${pageContext.request.contextPath}/board?page=${order.index}&kwd=${encodedKeyword}'>${order.index}</a>
+					        		<a href='${pageContext.request.contextPath}/board?page=${order.index}&category=${category}&kwd=${encodedKeyword}'>${order.index}</a>
 					        	</li>
 					        </c:forEach>
 					        <c:if test="${pagingBean.nextPageGroup == true}">
-					            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.endPageOfPageGroup +1 }&kwd=${encodedKeyword}">▶</a>
+					            <a href="${pageContext.request.contextPath}/board?page=${pagingBean.endPageOfPageGroup +1 }&category=${category}&kwd=${encodedKeyword}">▶</a>
 					        </c:if>
 						</c:otherwise>
 					</c:choose>

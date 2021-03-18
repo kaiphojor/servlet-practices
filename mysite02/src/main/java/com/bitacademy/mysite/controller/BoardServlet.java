@@ -102,6 +102,7 @@ public class BoardServlet extends HttpServlet {
 		}else {
 			// 검색어가 존재하면 utf-8으로 decoding 한 후 검색 결과를 보여준다.
 			String keyword = request.getParameter("kwd");
+			String category = request.getParameter("category");
 			int totalCount;
 			List<BoardVo> list;
 			
@@ -109,7 +110,7 @@ public class BoardServlet extends HttpServlet {
 				totalCount = new BoardDao().selectBoardListCnt();			
 			}else{
 				keyword = URLDecoder.decode(keyword,"UTF-8");
-				totalCount = new BoardDao().selectBoardListCnt("title",keyword);
+				totalCount = new BoardDao().selectBoardListCnt(category,keyword);
 			}
 			String pageNo = request.getParameter("page");
 			PagingBean pagingBean = null;			
@@ -122,8 +123,9 @@ public class BoardServlet extends HttpServlet {
 			if(keyword== null) {
 				list = new BoardDao().getBoardPageList(pagingBean);				
 			}else {
-				list = new BoardDao().searchBoardListByKeyword(pagingBean,"title",keyword);
+				list = new BoardDao().searchBoardListByKeyword(pagingBean,category,keyword);
 				request.setAttribute("keyword", keyword);
+				request.setAttribute("category", category);
 			}
 			
 			request.setAttribute("list", list);
