@@ -51,6 +51,10 @@ ALTER TABLE `user`
 
 ALTER TABLE `user`
 	MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '번호';
+
+-- 인덱스 추가
+CREATE INDEX idx_user ON user(no);
+
 ```
 
 * guestbook
@@ -75,6 +79,9 @@ ALTER TABLE `guestbook`
 
 ALTER TABLE `guestbook`
 	MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '번호';
+	
+-- 인덱스 추가
+CREATE INDEX idx_guestbook ON guestbook(no);
 ```
 
 * 게시판
@@ -114,6 +121,10 @@ ALTER TABLE `board`
 			`no` -- 번호
 		)
 		ON DELETE NO ACTION;
+		
+-- 인덱스 추가
+CREATE INDEX idx_board ON board(no);
+
 ```
 
 
