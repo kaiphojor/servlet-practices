@@ -52,5 +52,6 @@
 		<module>mysite02</module>
 		<module>jstlel</module>
 		<module>parsing</module>
+		<module>json</module>
 	</modules>
 </project>
