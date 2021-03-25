@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<input type=text id='urllink'>
+	<input type=button value="url 로드" onclick="createCORSRequest()">
+	<div id=output></div>
+
+	<h1>goodbye world</h1>
+	<p id="demo1"></p>
+	<p id="demo"></p>
+
+</body>
+<script>
+	function alertContents(httpRequest) {
+		if (httpRequest.readyState === XMLHttpRequest.DONE) {
+			if (httpRequest.status === 200) {
+				alert(httpRequest.responseText);
+			} else {
+				alert('request에 뭔가 문제가 있어요.');
+			}
+		}
+	}
+	function createCORSRequest() {
+		var addr = document.getElementById('urllink').value;
+		console.log(addr);
+		var xhr = new XMLHttpRequest();
+		if (!xhr) {
+			alert('XMLHTTP 인스턴스를 만들 수가 없어요 ㅠㅠ');
+			return false;
+		}
+		xhr.onreadystatechange = alertContents(xhr);
+		xhr.open('GET', addr);
+		xhr.setRequestHeader('Access-Control-Allow-Origin','*');
+		xhr.setRequestHeader('Access-Control-Allow-Methods', 'GET');
+		xhr.setRequestHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token');
+		xhr.send();
+	}
+
+	function getPage() {
+		var url = document.getElementById('urllink').innerHTML;
+		document.write(url);
+		var request = createCORSRequest(url);
+		if (request) {
+			request.onload = function() {
+				document.write('done');
+			};
+			request.send();
+		}
+	}
+
+	function loadURL() {
+
+		var url = document.all.url;
+		if (url.value == "") {
+			alert("url 을 입력해야합니다.");
+			url.focus();
+			return;
+		}
+
+		var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		xmlhttp.open("GET", url.value, "false");
+		xmlhttp.send();
+		//document.all.output.innerText = xmlhttp.responseText;
+		var text = xmlhttp.responseText;
+		var doc = new DOMParser().parseFromString(text, "text/html");
+		var atag = doc.getElementsByTagName('a');
+		var atagf = [];
+		for (var i = 0; i < atag.length; i++) {
+			if (atag[i].getAttribute('href').charAt(0) != '#') {
+				atagf.push(atag[i].getAttribute('href'));
+			}
+		}
+
+		var imgtag = doc.getElementsByTagName('img');
+		document.write('A tag 갯수 : ' + atag.length + '<br/>IMG tag 갯수 : '
+				+ imgtag.length + ' filtered ' + atagf.length);
+	}
+</script>
+</html>

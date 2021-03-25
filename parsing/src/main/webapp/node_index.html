@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html></html>
+<script>
+var title = document.createElement("title");
+var titlenode = document.createTextNode("Hello");
+title.appendChild(titlenode);
+
+var head = document.getElementsByTagName("head")[0];
+head.appendChild(title);
+
+var p1 = document.createElement("p");
+var p1node = document.createTextNode("This is a paragraph.");
+var p1att = document.createAttribute("id");
+p1att.value = "p1";
+p1.setAttributeNode(p1att);
+p1.appendChild(p1node);
+
+var p2 = document.createElement("p");
+var p2node = document.createTextNode("This is another paragraph.");
+var p2att = document.createAttribute("id");
+p2att.value = "p2";
+p2.setAttributeNode(p2att);
+p2.appendChild(p2node);
+
+var div = document.createElement("div");
+div.appendChild(p1);
+div.appendChild(p2);
+
+
+var body = document.getElementsByTagName("body")[0];
+body.appendChild(div);
+
+var html = document.getElementsByTagName("html")[0];
+html.appendChild(head);
+html.appendChild(body);
+</script>
+
