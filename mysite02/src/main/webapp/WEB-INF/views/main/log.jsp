@@ -42,10 +42,6 @@
 		} else {
 			historyList = [];
 		}
-		console.log(hist);
-		console.log(typeof historyList);
-		console.log(historyList === null); // false
-		console.log(historyList === undefined); // false
 		if (typeof (Storage) !== "undefined"
 				&& typeof historyList !== "undefined") {
 			var ol = document.getElementById('browserHistory');
@@ -68,10 +64,6 @@
 		} else {
 			clickHistoryList = [];
 		}
-		console.log(clickHist);
-		console.log(typeof clickHistoryList);
-		console.log(clickHistoryList === null); // false
-		console.log(clickHistoryList === undefined); // false
 		if (typeof (Storage) !== "undefined"
 				&& typeof clickHistoryList !== "undefined") {
 			var ol = document.getElementById('clickHistory');
@@ -83,6 +75,7 @@
 			}
 		}
 		
+		// 전체 히스토리 초기화 및 화면 수정
 		function clearAll(){
 			localStorage.removeItem('history');
 			localStorage.removeItem('clickHistory');
