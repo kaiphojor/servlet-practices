@@ -9,6 +9,13 @@
 <title>mysite</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <link href="${pageContext.servletContext.contextPath }/assets/css/board.css" rel="stylesheet" type="text/css">
+	<style type="text/css">
+
+        .odd { background-color:Silver; }
+
+        .Even { background-color : Aqua; }
+
+    </style>
 </head>
 <body>
 	<div id="container">
@@ -133,5 +140,19 @@
 		</c:import>
 		<c:import url="/WEB-INF/views/includes/footer.jsp"/>
 	</div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $('table.tbl-ex tbody tr:odd').addClass('odd');
+
+            $('table.tbl-ex tbody tr:even').addClass('Even');
+
+        });
+
+    </script>
 </body>
 </html>

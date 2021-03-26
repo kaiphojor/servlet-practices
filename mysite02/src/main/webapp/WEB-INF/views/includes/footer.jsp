@@ -18,8 +18,8 @@
 		browserHistory.push(url);
 		localStorage.setItem('history', JSON.stringify(browserHistory));
 	}
-	// 전체 클릭 이벤트 
-	var aTags = document.getElementsByTagName('A');
+	
+	// 이벤트 처리 함수(태그별 다른 처리)
 	var tagClickEvent = function(event) {		
 		//event.preventDefault();
 		event.stopPropagation();
@@ -31,10 +31,10 @@
 		var clickString = "";
 		console.log(elem.tagName);		
 		var tag = elem.tagName; 
-		clickString += tag + " clicked ";
+		clickString += tag + " TAG clicked ";
 		
-		// A tag 따로 처리 
-		if (elem.tagName == 'A') {
+		// 따로 처리하는 tag  
+		if (elem.tagName == 'A' || elem.tagName == 'TH' || elem.tagName == 'TD' || elem.tagName == 'LI') {
 			//clickString += elem.href + " ";
 			clickString += elem.innerHTML.trim() + " ";			
 			console.log(elem.innerHTML.trim());
@@ -49,7 +49,16 @@
 		localStorage.setItem('clickHistory', JSON.stringify(clickHistory));
 		
 	}
-	for (var i = 0; i < aTags.length; i++) {
-		aTags[i].onclick = tagClickEvent;
-	}
+	
+	// tag 별 event 처리 함수 등록
+	var aTags = document.getElementsByTagName('A');
+	var tdTags = document.getElementsByTagName('TD');
+	var thTags = document.getElementsByTagName('TH');
+	var liTags = document.getElementsByTagName('LI');
+	
+	Array.from(aTags).forEach(function(element, index, array){ element.onclick = tagClickEvent; });
+	Array.from(tdTags).forEach(function(element, index, array){ element.onclick = tagClickEvent; });
+	Array.from(thTags).forEach(function(element, index, array){ element.onclick = tagClickEvent; });
+	Array.from(liTags).forEach(function(element, index, array){ element.onclick = tagClickEvent; });
+
 </script>

@@ -48,9 +48,6 @@
 			for (var i = 0; i < historyList.length; i++) {
 				var li = document.createElement("li");
 				var liText = document.createTextNode(historyList[i]);
-				if(i == 0 && historyList[0].includes('log')){
-					continue;
-				}
 				li.appendChild(liText);
 				ol.appendChild(li);
 			}
