@@ -8,5 +8,6 @@
 		<li><a href="${pageContext.request.contextPath}">지망생 박지후</a></li>
 		<li><a href="${pageContext.request.contextPath}/guestbook">방명록</a></li>
 		<li><a href="${pageContext.request.contextPath}/board">게시판</a></li>
+		<li><a href="${pageContext.request.contextPath}/main?a=log">히스토리</a></li>
 	</ul>
 </div>
