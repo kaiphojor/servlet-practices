@@ -53,5 +53,6 @@
 		<module>jstlel</module>
 		<module>parsing</module>
 		<module>json</module>
+		<module>mongosite</module>
 	</modules>
 </project>
