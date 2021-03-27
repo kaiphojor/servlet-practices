@@ -40,7 +40,7 @@ public class ConnectMongoDbTest {
 //		deleteDoc(collection, 5959);
 //		findEqDoc(collection,5959);
 //		deleteManyDoc(collection, 200);
-		createIndex(collection, true);
+//		createIndex(collection, true);
 		System.out.println(collection.countDocuments());
 		findAllDoc(collection);
 	}
