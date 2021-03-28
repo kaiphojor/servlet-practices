@@ -1,4 +1,4 @@
-package com.bitacademy.mongosite.dao.test;
+package com.bitacademy.mongodbsite.dao.test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,6 +31,8 @@ public class ConnectMongoDbTest {
 		MongoCollection<Document> collection = database.getCollection("user");
 
 //		insertCounter(database);
+//		insertGuestbookCounter(database);
+//		insertBoardCounter(database);
 //		updateCounter(database);
 //		insertDoc(collection);
 //		insertManyDoc(collection);
@@ -56,9 +58,19 @@ public class ConnectMongoDbTest {
 //		System.out.println((Long)docRevised.get("seq"));
 		return (Long)docRevised.get("seq");
 	}
+	
+	// 각 Collection들의 auto increment index 역할 해주는 collection의 생성, 초기화
 
 	private static void insertCounter(MongoDatabase database) {
 		MongoCollection<Document> collection = database.getCollection("counter");
+		collection.insertOne(new Document("_id","userid").append("seq",0));		
+	}
+	private static void insertGuestbookCounter(MongoDatabase database) {
+		MongoCollection<Document> collection = database.getCollection("gbcounter");
+		collection.insertOne(new Document("_id","userid").append("seq",0));		
+	}
+	private static void insertBoardCounter(MongoDatabase database) {
+		MongoCollection<Document> collection = database.getCollection("bcounter");
 		collection.insertOne(new Document("_id","userid").append("seq",0));		
 	}
 

@@ -1,4 +1,4 @@
-package com.bitacademy.mongosite.dao;
+package com.bitacademy.mongodbsite.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,25 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bitacademy.mongosite.pagination.PagingBean;
-import com.bitacademy.mongosite.vo.BoardVo;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
+import com.bitacademy.mongodbsite.pagination.PagingBean;
+import com.bitacademy.mongodbsite.vo.BoardVo;
 
 public class BoardDao implements IBoardDao{
-	
-	public MongoDatabase getDB() {
-		MongoClient mongoClient = null;
-		MongoDatabase database = null;
-		try {
-			mongoClient = MongoClients.create("mongodb://sdfs:27017");			
-			database = mongoClient.getDatabase("webdb");
-		} catch (Exception e) {
-			System.out.println("error " + e);
-		}
-		return database;
-	}
 	public Connection getConnection() throws SQLException {
 		Connection conn = null;
 		try {

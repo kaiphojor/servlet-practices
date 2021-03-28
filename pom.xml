@@ -54,5 +54,6 @@
 		<module>parsing</module>
 		<module>json</module>
 		<module>mongosite</module>
+		<module>mongodbsite</module>
 	</modules>
 </project>

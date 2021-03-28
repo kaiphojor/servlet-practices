@@ -1,4 +1,4 @@
-package com.bitacademy.mongosite.controller;
+package com.bitacademy.mongodbsite.controller;
 
 
 import java.io.IOException;
@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.bitacademy.mongosite.mvc.WebUtil;
+import com.bitacademy.web.mvc.WebUtil;
 
-@WebServlet("/")
+@WebServlet("/main")
 public class MainServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

@@ -16,7 +16,7 @@
 
     <function>
         <name>urlEncode</name>
-        <function-class>com.bitacademy.mongosite.mvc.WebUtil</function-class>
+        <function-class>com.bitacademy.web.mvc.WebUtil</function-class>
         <function-signature>java.lang.String urlEncode(java.lang.String, java.lang.String)</function-signature>
     </function>
 </taglib>

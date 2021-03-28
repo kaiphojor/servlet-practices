@@ -1,11 +1,11 @@
-package com.bitacademy.mongosite.dao;
+package com.bitacademy.mongodbsite.dao;
 
 import java.util.Date;
 
 import org.bson.Document;
 
-import com.bitacademy.mongosite.mvc.WebUtil;
-import com.bitacademy.mongosite.vo.UserVo;
+import com.bitacademy.web.mvc.WebUtil;
+import com.bitacademy.mongodbsite.vo.UserVo;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;

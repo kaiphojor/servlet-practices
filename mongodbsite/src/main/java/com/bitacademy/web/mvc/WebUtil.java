@@ -1,4 +1,4 @@
-package com.bitacademy.mongosite.mvc;
+package com.bitacademy.web.mvc;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -34,5 +34,13 @@ public class WebUtil {
 	public static String getFormatDate(Date date) {
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return format.format(date);
+	}
+	// Integer -> Long으로 변환 
+	public static Long intToLong(int intValue) {
+		return Long.parseLong(String.valueOf(intValue));
+	}
+	// Long -> Integer 으로 변환 
+	public static int longToInt(long longValue) {
+		return Integer.parseInt(String.valueOf(longValue));
 	}
 }

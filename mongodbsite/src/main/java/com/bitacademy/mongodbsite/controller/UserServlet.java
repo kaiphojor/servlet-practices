@@ -1,4 +1,4 @@
-package com.bitacademy.mongosite.controller;
+package com.bitacademy.mongodbsite.controller;
 
 
 import java.io.IOException;
@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.bitacademy.mongosite.dao.UserDao;
-import com.bitacademy.mongosite.vo.UserVo;
-import com.bitacademy.mongosite.mvc.WebUtil;
+import com.bitacademy.mongodbsite.dao.UserDao;
+import com.bitacademy.mongodbsite.vo.UserVo;
+import com.bitacademy.web.mvc.WebUtil;
 
 /**
  * Servlet implementation class UserServlet
