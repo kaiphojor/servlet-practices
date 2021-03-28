@@ -1,5 +1,18 @@
 package com.bitacademy.mongodbsite.dao.test;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.lt;
+import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
+import static com.mongodb.client.model.Sorts.orderBy;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.inc;
+import static com.mongodb.client.model.Updates.set;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,13 +21,13 @@ import java.util.List;
 
 import org.bson.Document;
 
+import com.bitacademy.mongodbsite.dao.BoardDao;
+import com.bitacademy.mongodbsite.vo.BoardVo;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
@@ -28,7 +41,7 @@ public class ConnectMongoDbTest {
 
 		MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 		MongoDatabase database = mongoClient.getDatabase("webdb");
-		MongoCollection<Document> collection = database.getCollection("user");
+		MongoCollection<Document> collection = database.getCollection("board");
 
 //		insertCounter(database);
 //		insertGuestbookCounter(database);
@@ -40,6 +53,8 @@ public class ConnectMongoDbTest {
 //		findDoc(collection);
 //		findEqDoc(collection,0);
 //		findGtDoc(collection,70);
+//		findMaxVal(collection,70);
+		
 //		findRangeDoc(collection,30,50);
 //		updateDoc(collection,0,5959);
 //		updateManyDoc(collection,120,100);
@@ -47,14 +62,40 @@ public class ConnectMongoDbTest {
 //		findEqDoc(collection,5959);
 //		deleteManyDoc(collection, 200);
 //		createIndex(collection, true);
+//		addTest();
 		System.out.println(collection.countDocuments());
 		findAllDoc(collection);
 	}
+	private static void addTest() {
+		BoardVo vo = new BoardVo();
+		vo.setUserNo(1L);
+		vo.setTitle("testtest");
+		vo.setContents("whaseraefjawf");
+		new BoardDao().insertBoard(vo);
+	}
+	private static void aggregationTest() {
+		
+	}
+	
+	// 최대 값 찾기
+	private static void findMaxVal(MongoCollection<Document> collection, int i) {
+		Document doc = collection.find().sort(descending("no")).first();
+		int no = doc.getInteger("group_no", 0)+1;
+//		int no = (int)doc.get("no");
+		System.out.println(no);
+		
+		List<Document> list = collection.find().sort(orderBy(descending("group_no"),ascending("order_no"))).limit(5).into(new ArrayList<Document>());
+		
+		Long order_no = (Long)(collection.find(eq("group_no",1L)).sort(descending("order_no")).first().get("order_no"));
+		collection.findOneAndDelete(
+				and(eq("group_no",1L),eq("order_no",order_no)));
+	}
+
 	private static Long updateCounter() {
 		MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 		MongoDatabase database = mongoClient.getDatabase("webdb");
 		MongoCollection<Document> collection = database.getCollection("counter");
-		Document docRevised = collection.findOneAndUpdate(Filters.eq("_id","userid"),Updates.inc("seq",1));
+		Document docRevised = collection.findOneAndUpdate(eq("_id","userid"),inc("seq",1));
 //		System.out.println((Long)docRevised.get("seq"));
 		return (Long)docRevised.get("seq");
 	}
@@ -109,7 +150,7 @@ public class ConnectMongoDbTest {
 	public static void findDoc(MongoCollection<Document> collection) {
 //		Document myDoc = collection.find().first();
 //		System.out.println(myDoc.toJson());
-		Document myDoc = collection.find(Filters.eq("name","rck")).first();
+		Document myDoc = collection.find(eq("name","rck")).first();
 		System.out.println(myDoc.get("_id"));
 		System.out.println(myDoc.get("name"));
 		System.out.println(myDoc.get("email"));
@@ -122,7 +163,7 @@ public class ConnectMongoDbTest {
 	}
 	// 값이 일치하는  document print
 	public static void findEqDoc(MongoCollection<Document> collection,int val) {
-		Document myDoc = collection.find(Filters.eq("i", val)).first();
+		Document myDoc = collection.find(eq("i", val)).first();
 		if(null != myDoc) {
 			System.out.println(myDoc.toJson());			
 		}else {
@@ -131,16 +172,17 @@ public class ConnectMongoDbTest {
 	}
 	// 값보다큰 document print
 	public static void findGtDoc(MongoCollection<Document> collection,int val) {
-		collection.find(Filters.gt("i", val))
+		collection.find(gt("i", val))
         .forEach(doc -> System.out.println(doc.toJson()));
 	}
 	// 지정한 범위 값의 document print(초과, 이하)
 	public static void findRangeDoc(MongoCollection<Document> collection,int start,int end) {
-		collection.find(Filters.and(Filters.gt("i", start), Filters.lte("i", end)))
+		collection.find(and(gt("i", start), lte("i", end)))
         .forEach(doc -> System.out.println(doc.toJson()));
+		
 	}
 	// print all document 
-	public static void findAllDoc(MongoCollection<Document> collection) {
+	public static void findAllDoc(MongoCollection<Document> collection) {		
 		MongoCursor<Document> cursor = collection.find().iterator();
 		try {
 		    while (cursor.hasNext()) {
@@ -153,26 +195,31 @@ public class ConnectMongoDbTest {
 	// update document 
 	public static void updateDoc(MongoCollection<Document> collection,int target,int value) {
 //		collection.updateOne(Filters.eq("i", target),Updates.set("i", value));
-		collection.findOneAndUpdate(Filters.eq("name", "zzz"),Updates.combine(
-				Updates.set("name", "jenkins"),
-				Updates.set("email", "jenkins@gmail.com"),
-				Updates.set("password", "asdf"),
-				Updates.set("gender", "female")
-		    ));
-		
+		collection.findOneAndUpdate(eq("name", "zzz"),combine(
+				set("name", "jenkins"),
+				set("email", "jenkins@gmail.com"),
+				set("password", "asdf"),
+				set("gender", "female")
+		    ));		
 	}
 	// update multiple document 
 	public static void updateManyDoc(MongoCollection<Document> collection,int condition,int value) {
-		UpdateResult updateResult = collection.updateMany(Filters.lt("i", condition), Updates.inc("i", value));
+		UpdateResult updateResult = collection.updateMany(lt("i", condition), inc("i", value));
 		System.out.println(updateResult.getModifiedCount());
+		Long group_no=1L,order_no=1L;
+		collection.updateMany(and(
+				eq("group_no", group_no)
+				,gt("order_no", order_no))
+				,inc("order_no", 1));
+		
 	}
 	// delete document 
 	public static void deleteDoc(MongoCollection<Document> collection,int value) {
-		collection.deleteOne(Filters.eq("i", value));
+		collection.deleteOne(eq("i", value));
 	}
 	// delete multiple document 
 	public static void deleteManyDoc(MongoCollection<Document> collection,int condition) {
-		DeleteResult deleteResult = collection.deleteMany(Filters.gte("i", condition));
+		DeleteResult deleteResult = collection.deleteMany(gte("i", condition));
 		System.out.println(deleteResult.getDeletedCount());
 	}
 	// create index()
