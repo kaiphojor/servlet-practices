@@ -1,20 +1,32 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<%@ page language="java" import="java.io.*,java.net.*" pageEncoding="UTF-8"%>
+<%@page import="java.io.*"%>
+<%@page import="java.net.*"%>
+<%@page language="java" pageEncoding="UTF-8"%>
 <%
 URL url = new URL(request.getParameter("getUrl"));
 URLConnection connection = url.openConnection();
 connection.setRequestProperty("CONTENT-TYPE", "application/xml");
-BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
+//BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
+BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+/*
 String inputLine;
 String buffer = "";
 while ((inputLine = in.readLine()) != null) {
 	buffer += inputLine.trim();
 }
+*/
+
+String inputLine;
+final StringBuilder buffer = new StringBuilder();
+while ((inputLine = in.readLine()) != null) {
+	buffer.append(inputLine).append("\n");
+}
+
 System.out.println("buffer : " + buffer);
 in.close();
+response.setContentType("application/xml");
+out.print(buffer);
 /*
+import="java.io.*,java.net.*" 
 String url = request.getParameter("getUrl");
 BufferedReader br = null;
 try {
@@ -24,7 +36,7 @@ try {
     String line;
     final StringBuilder sb = new StringBuilder();
     while ((line = br.readLine()) != null) {
-sb.append(line).append("\n");
+		sb.append(line).append("\n");
     }
 
     //return sb.toString();

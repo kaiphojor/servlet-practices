@@ -38,10 +38,9 @@
 						$('#result').innerHTML = result;
 					});
 				}
-			}, 
-			"data": "",
+			},
 			"async" : "true",
-			"dataType" : "xml",
+			"dataType" : "text",
 			"error" : function(x, o, e) {
 				alert(x.status + ":" + o + ":" + e);
 			}
