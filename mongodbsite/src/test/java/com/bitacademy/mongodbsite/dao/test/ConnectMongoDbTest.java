@@ -28,6 +28,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
@@ -46,6 +47,12 @@ public class ConnectMongoDbTest {
 //		insertCounter(database);
 //		insertGuestbookCounter(database);
 //		insertBoardCounter(database);
+//		createIndex(database);
+		
+		
+		
+//		addTest();
+		
 //		updateCounter(database);
 //		insertDoc(collection);
 //		insertManyDoc(collection);
@@ -62,10 +69,19 @@ public class ConnectMongoDbTest {
 //		findEqDoc(collection,5959);
 //		deleteManyDoc(collection, 200);
 //		createIndex(collection, true);
-//		addTest();
 		System.out.println(collection.countDocuments());
 		findAllDoc(collection);
 	}
+	// 인덱스 생성 (no)
+	private static void createIndex(MongoDatabase database) {
+		MongoCollection<Document> collection = database.getCollection("user");
+		MongoCollection<Document> bcollection = database.getCollection("board");
+		MongoCollection<Document> gbcollection = database.getCollection("guestbook");
+		collection.createIndex(Indexes.ascending("no"));
+		bcollection.createIndex(Indexes.ascending("no"));
+		gbcollection.createIndex(Indexes.ascending("no"));
+	}
+
 	private static void addTest() {
 		BoardVo vo = new BoardVo();
 		vo.setUserNo(1L);
@@ -105,15 +121,12 @@ public class ConnectMongoDbTest {
 	private static void insertCounter(MongoDatabase database) {
 		MongoCollection<Document> collection = database.getCollection("counter");
 		collection.insertOne(new Document("_id","userid").append("seq",0));		
+		MongoCollection<Document> gbcollection = database.getCollection("gbcounter");
+		gbcollection.insertOne(new Document("_id","userid").append("seq",0));		
+		MongoCollection<Document> bcollection = database.getCollection("bcounter");
+		bcollection.insertOne(new Document("_id","userid").append("seq",0));		
 	}
-	private static void insertGuestbookCounter(MongoDatabase database) {
-		MongoCollection<Document> collection = database.getCollection("gbcounter");
-		collection.insertOne(new Document("_id","userid").append("seq",0));		
-	}
-	private static void insertBoardCounter(MongoDatabase database) {
-		MongoCollection<Document> collection = database.getCollection("bcounter");
-		collection.insertOne(new Document("_id","userid").append("seq",0));		
-	}
+
 
 	// document 추가
 	public static boolean insertDoc(MongoCollection<Document> collection) {

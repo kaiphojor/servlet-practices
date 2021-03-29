@@ -25,6 +25,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Variable;
+import com.mongodb.internal.client.model.AggregationLevel;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Sorts.*;
@@ -211,36 +212,23 @@ public class BoardDao implements IBoardDao{
 	}
 	// 게시물 리스팅(게시판)
 	public List<BoardVo> getBoardPageList(PagingBean pagingBean){
-//		List<BoardVo> list = new ArrayList<BoardVo>();
-		Connection conn = null ;
-		PreparedStatement pstmt = null;
-		String sql = null;	
-		
-		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
-			//
-			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
-			sql =  "set sql_safe_updates=0;";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.executeQuery();	
-			pstmt.close();
-			
-						
-			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
+
+//		return list;
+		/*
+		 * 			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
 					+ " date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views, u.name "
 					+ "	from board b "
 					+ " join user u "
 					+ " on b.user_no = u.no "					
 					+ "	order by group_no DESC, order_no ASC"
 					+ " LIMIT ?, ? ;";
-			
-			pstmt = conn.prepareStatement(sql);
+					
+								pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, pagingBean.getStartRowNumber()-1);
 			pstmt.setInt(2, pagingBean.getEndRowNumber() - pagingBean.getStartRowNumber()+1);
 			
-			ResultSet rs = pstmt.executeQuery();
-			while(rs.next()) {
+					
+								while(rs.next()) {
 				BoardVo vo = new BoardVo();
 				vo.setNo(rs.getLong(1));
 				vo.setUserNo(rs.getLong(2));
@@ -253,31 +241,6 @@ public class BoardDao implements IBoardDao{
 				vo.setUserName(rs.getString(9));
 //				list.add(vo);
 			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				if(conn != null) {
-					conn.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				
-			}catch (Exception e) {
-				// TODO: handle exception
-			}
-		}
-//		return list;
-		/*
-		 * 			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
-					+ " date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views, u.name "
-					+ "	from board b "
-					+ " join user u "
-					+ " on b.user_no = u.no "					
-					+ "	order by group_no DESC, order_no ASC"
-					+ " LIMIT ?, ? ;";
 		 */
 		
 		List<BoardVo> list = new ArrayList<BoardVo>();
@@ -293,10 +256,12 @@ public class BoardDao implements IBoardDao{
 			client = getClient();
 			db = getDB(client);
 			collection = getCollection(db);
-			match(eq("no",2L));
-			project(fields(include("no","name")));
-			sort(orderBy(descending("group_no"), ascending("order_no")));
-			limit(5);
+			
+			
+//			match(eq("no",2L));
+//			project(fields(include("no","name")));
+//			sort(orderBy(descending("group_no"), ascending("order_no")));
+//			limit(5);
             List<Variable<String>> variable = asList(new Variable<>("user_no", "$uno"));
             
 //            project(computed("user_name", "$name"));
@@ -304,6 +269,7 @@ public class BoardDao implements IBoardDao{
             		match(expr(new Document("$eq",asList("$no", "$$uno")))),
             		project(fields(include("name"),excludeId())));
             Bson pipe = lookup("user",variable,pipeline,"user_name");
+            //Aggregations.
 			/*
 			 * https://github.com/mongodb/mongo-java-driver/blob/master/docs/reference/content/builders/aggregation.md
 			 * 
@@ -409,26 +375,14 @@ public class BoardDao implements IBoardDao{
 	}
 	@Override
 	public BoardVo getBoard(Long no) {
-		Connection conn = null ;
-		PreparedStatement pstmt = null;
-		String sql = null;
-		BoardVo vo = null;
-		try {
-			conn = getConnection();	
-//			conn = getConnection("slave1");	
-			
-			// 게시물 전체 내용 가져오기
+		/*
+		 * 			// 게시물 전체 내용 가져오기
 			sql =  " select b.no, b.user_no, b.title, b.group_no, b.order_no, "
 					+ " b.depth, b.contents, date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views "
 					+ "	from board b "
-					+ " join user u on b.no = ? and b.user_no = u.no;";					
-			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, no);
-			
-			ResultSet rs = pstmt.executeQuery();
-			if(rs.next()) {
-				vo = new BoardVo();
+					+ " join user u on b.no = ? and b.user_no = u.no;";		
+					
+									vo = new BoardVo();
 				vo.setNo(rs.getLong(1));
 				vo.setUserNo(rs.getLong(2));
 				vo.setTitle(rs.getString(3));
@@ -438,23 +392,8 @@ public class BoardDao implements IBoardDao{
 				vo.setContents(rs.getString(7));
 				vo.setRegDate(rs.getString(8));
 				vo.setUserName(rs.getString(9));
-			}			
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				if(conn != null) {
-					conn.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				
-			}catch (Exception e) {
-				// TODO: handle exception
-			}
-		}
+		 */
+		BoardVo vo = null;
 		return vo;
 	}
 	@Override

@@ -55,5 +55,6 @@
 		<module>json</module>
 		<module>mongosite</module>
 		<module>mongodbsite</module>
+		<module>apitest</module>
 	</modules>
 </project>
