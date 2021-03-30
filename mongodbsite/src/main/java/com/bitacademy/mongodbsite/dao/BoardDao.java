@@ -64,41 +64,6 @@ public class BoardDao implements IBoardDao{
 		Document docRevised = collection.findOneAndUpdate(eq("_id","userid"),inc("seq",1));
 		return Long.valueOf(docRevised.get("seq").toString());
 	}
-	
-	
-	public Connection getConnection() throws SQLException {
-		Connection conn = null;
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:3306/webdb?characterEncoding=utf8&serverTimezone=UTC";
-			conn = DriverManager.getConnection(url,"webdb","webdb");
-		} catch (ClassNotFoundException e) {
-			System.out.println("error " + e);
-		}		
-		return conn;
-	}
-	// db 복제를 위한 getConnection
-	public Connection getConnection(String dbName) throws SQLException {
-		// connection map
-		Map<String, Integer> portMap = new HashMap<>();
-		portMap.put("master", 3307);
-		portMap.put("slave1", 3308);
-		portMap.put("slave2", 3309);
-		portMap.put("slave3", 3310);
-		Connection conn = null;
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:"+portMap.get(dbName)+"/webdb?characterEncoding=utf8&serverTimezone=UTC";
-			if("master".equals(dbName)) {
-				conn = DriverManager.getConnection(url, "root", "masterpw");
-			}else{
-				conn = DriverManager.getConnection(url, "root", "slavepw");
-			}
-		} catch (ClassNotFoundException e) {
-			System.out.println("error " + e);
-		}
-		return conn;
-	}
 	// 게시물 입력 (답글 제외)
 	public boolean insertBoard(BoardVo vo) {
 		/*
@@ -262,13 +227,7 @@ public class BoardDao implements IBoardDao{
 //			project(fields(include("no","name")));
 //			sort(orderBy(descending("group_no"), ascending("order_no")));
 //			limit(5);
-            List<Variable<String>> variable = asList(new Variable<>("user_no", "$uno"));
-            
-//            project(computed("user_name", "$name"));
-            List<Bson> pipeline = asList(
-            		match(expr(new Document("$eq",asList("$no", "$$uno")))),
-            		project(fields(include("name"),excludeId())));
-            Bson pipe = lookup("user",variable,pipeline,"user_name");
+
             //Aggregations.
 			/*
 			 * https://github.com/mongodb/mongo-java-driver/blob/master/docs/reference/content/builders/aggregation.md
@@ -303,9 +262,15 @@ public class BoardDao implements IBoardDao{
 					long no = (long)(resultDoc.get("no")); 
 					boardVo.setNo(no);
 //					boardVo.setName((String) resultDoc.get("name"));
-//					boardVo.setPassword((String) resultDoc.get("password"));
+					boardVo.setUserNo( resultDoc.getLong("user_no"));
+//					boardVo.setUserName( resultDoc.getString("user_name"));
+					boardVo.setTitle( resultDoc.getString("title"));
+					boardVo.setGroupNo( resultDoc.getLong("group_no"));
+					boardVo.setOrderNo( resultDoc.getLong("order_no"));
+					boardVo.setDepth( resultDoc.getLong("depth"));
 					boardVo.setContents((String) resultDoc.get("contents"));
 					boardVo.setRegDate(WebUtil.getFormatDate((Date) resultDoc.get("reg_date")));
+					boardVo.setViews( resultDoc.getLong("views"));
 					list.add(boardVo);
 				}
 			} finally {
@@ -429,7 +394,6 @@ public class BoardDao implements IBoardDao{
 		String sql = null;	
 		
 		try {
-			conn = getConnection();
 //			conn = getConnection("slave1");
 			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
 			sql =  "set sql_safe_updates=0;";
@@ -524,7 +488,6 @@ public class BoardDao implements IBoardDao{
 		String sql = null;
 		int result = 0;
 		try {
-			conn = getConnection();	
 //			conn = getConnection("slave1");	
 			
 			// 게시물 전체 내용 가져오기

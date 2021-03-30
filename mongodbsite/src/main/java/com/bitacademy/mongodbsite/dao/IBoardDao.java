@@ -8,8 +8,6 @@ import com.bitacademy.mongodbsite.pagination.PagingBean;
 import com.bitacademy.mongodbsite.vo.BoardVo;
 // BoardDao interface
 public interface IBoardDao {
-	// 연결
-	public Connection getConnection()  throws SQLException;
 	// 게시물 생성 
 	public boolean insertBoard(BoardVo vo);
 	// 답글 생성
