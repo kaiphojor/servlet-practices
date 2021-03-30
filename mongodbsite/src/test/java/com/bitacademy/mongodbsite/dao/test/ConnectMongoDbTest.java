@@ -1,5 +1,5 @@
 package com.bitacademy.mongodbsite.dao.test;
-
+import static com.mongodb.client.model.Aggregates.replaceWith;
 import static com.mongodb.client.model.Aggregates.lookup;
 import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Aggregates.project;
@@ -104,11 +104,8 @@ public class ConnectMongoDbTest {
 								,pipeline
 								, "user")
 						,unwind("$user")
-//						,new AggregateOperation() {
-//							
-//						}
 //						,unwind("$user.name")
-//						,project(fields(include("user.name"),excludeId()))
+						,project(fields(include("user.name","no","user_no","title","group_no", "order_no","depth")))
 						//,unwind("$name.name",new UnwindOptions().includeArrayIndex("name"))
 					)
 				).iterator();
