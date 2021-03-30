@@ -44,7 +44,7 @@ tr:nth-child(even) {
 		xhttp
 				.open(
 						"GET",
-						"http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?solYear=2019&solMonth=03&ServiceKey=eYB0JZN3NsY9SlT3WN3qNZm0%2BCYERztmFWTaz4pBpiMgvYx2qcKHA8o3Xbx7d7lDTdj5J2XA4sEMLVG%2BW8Ih%2Bg%3D%3D",
+						"http://openAPI.songpa.seoul.kr:8088/71456d5164666f753539587572624f/xml/SpModelRestaurantDesignate/1/5/",
 						true);
 		//xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
 		xhttp.setRequestHeader("Content-type", "application/xml");
@@ -57,23 +57,6 @@ tr:nth-child(even) {
 	<script type="text/javascript"
 		src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-	<script>
-		$(document).ready(function() {
-			$.ajax({
-				type : 'GET',
-				dataType : 'jsonp',
-				data : {
-					'name' : 'kimyeonsuk'
-				},
-				url : 'http://www.stoneis.pe.kr/jsonp/jsonpResult.jsp',
-				// jsonp 값을 전달할 때 사용되는 파라미터 변수명
-				// 이 속성을 생략하면 callback 파라미터 변수명으로 전달된다.
-				jsonp : 'stone',
-				success : function(json) {
-					$('.result').html(json.data.name);
-				}
-			});
-		});
-	</script>
+
 </body>
 </html>
