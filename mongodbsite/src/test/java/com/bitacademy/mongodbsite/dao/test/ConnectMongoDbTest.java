@@ -82,7 +82,11 @@ public class ConnectMongoDbTest {
 //		deleteManyDoc(collection, 200);
 //		createIndex(collection, true);
 //		joinCollection(database);
-		findDocByCondition(database,0L);
+//		findDocByCondition(database,0L);
+		
+		for(int i=0; i< 20; i++) {
+			addTest(i);
+		}
 		System.out.println(collection.countDocuments());
 		findAllDoc(collection);
 		
@@ -184,11 +188,11 @@ public class ConnectMongoDbTest {
 		gbcollection.createIndex(Indexes.ascending("no"));
 	}
 
-	private static void addTest() {
+	private static void addTest(int n) {
 		BoardVo vo = new BoardVo();
 		vo.setUserNo(1L);
-		vo.setTitle("testtest");
-		vo.setContents("whaseraefjawf");
+		vo.setTitle("test" + n);
+		vo.setContents("test 내용");
 		new BoardDao().insertBoard(vo);
 	}
 

@@ -204,33 +204,9 @@ public class BoardDao implements IBoardDao{
 			db = getDB(client);
 			collection = getCollection(db);
 			
+			// aggregation 수행 
 			
-//			match(eq("no",2L));
-//			project(fields(include("no","name")));
-//			sort(orderBy(descending("group_no"), ascending("order_no")));
-//			limit(5);
-
-            //Aggregations.
-			/*
-			 * https://github.com/mongodb/mongo-java-driver/blob/master/docs/reference/content/builders/aggregation.md
-			 * 
-			 * https://docs.mongodb.com/manual/reference/operator/aggregation/
-			 * 
-			 * https://developer.mongodb.com/community/forums/t/aggregation-pipeline-with-lookup-in-java/100454
-			 * 
-			 * https://www.baeldung.com/java-mongodb-aggregations
-			 * 
-			 * https://mongodb.github.io/mongo-java-driver/3.2/builders/aggregation/
-			 * 
-			 * https://docs.mongodb.com/manual/tutorial/aggregation-with-user-preference-data/
-			 */
-			
-//			List<Document> docList = collection
-//					.find()
-//					.sort(orderBy(descending("group_no"),ascending("order_no")))
-//					.limit(5)
-//					.into(new ArrayList<Document>());
-			
+//			lookup용 변수 , 파이프라인 준비  
 			List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
 			List<Bson> pipeline = asList(
 					match(

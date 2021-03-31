@@ -141,7 +141,7 @@ public class PagingBean {
 		if(getNowPage() == getTotalPage()) {
 			return 0;
 		}
-		int remains = getTotalPage() % getContentNumberPerPage(); 
+		int remains = getTotalPage() % getContentNumberPerPage() +1; 
 		return (getTotalPage() - getNowPage()-1) * contentNumberPerPage + remains;						
 	}
    
