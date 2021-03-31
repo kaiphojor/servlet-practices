@@ -20,6 +20,12 @@
 						<th colspan="2">글보기</th>
 					</tr>
 					<tr>
+						<td class="label">글쓴이</td>
+						<td>${vo.userName}</td>
+						<td class="label">조회수</td>
+						<td>${vo.views}</td>
+					</tr>
+					<tr>
 						<td class="label">제목</td>
 						<td>${vo.title}</td>
 					</tr>

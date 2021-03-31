@@ -191,21 +191,6 @@ public class BoardDao implements IBoardDao{
 								pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, pagingBean.getStartRowNumber()-1);
 			pstmt.setInt(2, pagingBean.getEndRowNumber() - pagingBean.getStartRowNumber()+1);
-			
-					
-								while(rs.next()) {
-				BoardVo vo = new BoardVo();
-				vo.setNo(rs.getLong(1));
-				vo.setUserNo(rs.getLong(2));
-				vo.setTitle(rs.getString(3));
-				vo.setGroupNo(rs.getLong(4));
-				vo.setOrderNo(rs.getLong(5));
-				vo.setDepth(rs.getLong(6));
-				vo.setRegDate(rs.getString(7));
-				vo.setViews(rs.getLong(8));
-				vo.setUserName(rs.getString(9));
-//				list.add(vo);
-			}
 		 */
 		
 		List<BoardVo> list = new ArrayList<BoardVo>();
@@ -213,9 +198,6 @@ public class BoardDao implements IBoardDao{
 		MongoClient client = null;
 		MongoDatabase db = null;
 		MongoCollection<Document> collection = null;
-		Document resultDoc = null;
-		BoardVo boardVo = null;
-		MongoCursor<Document> cursor = null;
 		BoardVo vo = null;
 		try {
 			client = getClient();
@@ -267,7 +249,7 @@ public class BoardDao implements IBoardDao{
 							,unwind("$user_name")
 							,new Document("$addFields",new Document("user_name","$user_name.name"))
 							,sort(orderBy(descending("group_no"),ascending("order_no")))
-							,skip(0)
+							//,skip(pagingBean.getStartRowNumber()-1-1)
 							,limit(5)
 						)
 					).into(new ArrayList<Document>());
@@ -375,6 +357,7 @@ public class BoardDao implements IBoardDao{
 	}
 	@Override
 	public BoardVo getBoard(Long no) {
+		System.out.println(no);
 		/*
 		 * 			// 게시물 전체 내용 가져오기
 			sql =  " select b.no, b.user_no, b.title, b.group_no, b.order_no, "
@@ -393,7 +376,59 @@ public class BoardDao implements IBoardDao{
 				vo.setRegDate(rs.getString(8));
 				vo.setUserName(rs.getString(9));
 		 */
+		MongoClient client = null;
+		MongoDatabase db = null;
+		MongoCollection<Document> collection = null;
 		BoardVo vo = null;
+		try {
+			client = getClient();
+			db = getDB(client);
+			collection = getCollection(db);
+			
+			List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
+			List<Bson> pipeline = asList(
+					match(
+							expr(
+									new Document("$eq", asList("$no", "$$uno"))
+								
+							)
+						)
+					,project(
+							fields(include("name"),excludeId())
+							)
+					);
+			List<Document> documents = collection.aggregate(
+					asList(
+							match(eq("no",no))
+							,lookup("user", variable, pipeline, "user_name")
+							,unwind("$user_name")
+							,new Document("$addFields",new Document("user_name","$user_name.name"))
+							,limit(1)
+						)
+					).into(new ArrayList<Document>());
+			
+			for(Document doc : documents) {
+				vo = new BoardVo();
+				vo.setNo(no);
+				vo.setUserNo( doc.getLong("user_no"));
+				vo.setUserName( doc.getString("user_name"));
+				vo.setTitle( doc.getString("title"));
+				vo.setGroupNo( doc.getLong("group_no"));
+				vo.setOrderNo( doc.getLong("order_no"));
+				vo.setDepth( doc.getLong("depth"));
+				vo.setContents((String) doc.get("contents"));
+				vo.setRegDate(WebUtil.getFormatDate((Date) doc.get("reg_date")));
+				vo.setViews( doc.getLong("views"));
+				//System.out.println(vo.toString());
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			client.close();
+		}		
+		
+		
 		return vo;
 	}
 	@Override

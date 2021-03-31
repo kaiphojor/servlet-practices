@@ -33,6 +33,7 @@ import org.bson.conversions.Bson;
 
 import com.bitacademy.mongodbsite.dao.BoardDao;
 import com.bitacademy.mongodbsite.vo.BoardVo;
+import com.bitacademy.web.mvc.WebUtil;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -80,11 +81,55 @@ public class ConnectMongoDbTest {
 //		findEqDoc(collection,5959);
 //		deleteManyDoc(collection, 200);
 //		createIndex(collection, true);
-		joinCollection(database);
+//		joinCollection(database);
+		findDocByCondition(database,0L);
 		System.out.println(collection.countDocuments());
 		findAllDoc(collection);
+		
+	}
+	private static void findDocByCondition(MongoDatabase database,Long no) {
+		MongoCollection<Document> collection = database.getCollection("board");
+		BoardVo vo = null;
+		System.out.println(no);
+		List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
+		List<Bson> pipeline = asList(
+				match(
+						expr(
+								new Document("$eq", asList("$no", "$$uno")
+							)
+						)
+					)
+				,project(
+						fields(include("name"),excludeId())
+						)
+				);
+		List<Document> documents = collection.aggregate(
+				asList(
+						match(eq("no",no))
+						,lookup("user", variable, pipeline, "user_name")
+						,unwind("$user_name")
+						,new Document("$addFields",new Document("user_name","$user_name.name"))
+					)
+				).into(new ArrayList<Document>());
+		
+		for(Document doc : documents) {
+			vo = new BoardVo();
+			vo.setNo(no);
+			vo.setUserNo( doc.getLong("user_no"));
+			vo.setUserName( doc.getString("user_name"));
+			vo.setTitle( doc.getString("title"));
+			vo.setGroupNo( doc.getLong("group_no"));
+			vo.setOrderNo( doc.getLong("order_no"));
+			vo.setDepth( doc.getLong("depth"));
+			vo.setContents((String) doc.get("contents"));
+			vo.setRegDate(WebUtil.getFormatDate((Date) doc.get("reg_date")));
+			vo.setViews( doc.getLong("views"));
+			System.out.println(vo.toString());
+		}
+		
 	}
 
+	// 
 	// join 하기
 	private static void joinCollection(MongoDatabase database) {
 		MongoCollection<Document> collection = database.getCollection("board");
