@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.bson.BsonRegularExpression;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -218,17 +220,22 @@ public class BoardDao implements IBoardDao{
 							fields(include("name"),excludeId())
 							)
 					);
-			
+			// 페이징 관련 부분
 			List<Document> docList = null;
 			int skipNum = pagingBean.getStartRowNumber()-1; 
 			//System.out.println(skipNum);
 			if( skipNum >0) {
 				docList = collection.aggregate(
 						asList(
+								// 찾아볼 collection / 사용할 변수 / 변수가 사용될 pipeline / output field name
 								lookup("user", variable, pipeline, "user_name")
+								// user_name 배열을 해체 ( [1,2,3] -> 1 / 2 / 3 다른 document로 분리
 								,unwind("$user_name")
+								// 새로운 field 추가 - nesting 된 field를 상위 field에 재지정
 								,new Document("$addFields",new Document("user_name","$user_name.name"))
+								// group number 별 내림차순 & order number 오름차순
 								,sort(orderBy(descending("group_no"),ascending("order_no")))
+								// 지정한 글 개수 만큼 skip - paging 처리
 								,skip(skipNum)
 								,limit(5)
 							)
@@ -245,17 +252,6 @@ public class BoardDao implements IBoardDao{
 						).into(new ArrayList<Document>());
 			}
 			
-//			List<Document> docList = collection.aggregate(
-//					asList(
-//							skip(skipNum)
-//							,lookup("user", variable, pipeline, "user_name")
-//							,unwind("$user_name")
-//							,new Document("$addFields",new Document("user_name","$user_name.name"))
-//							,sort(orderBy(descending("group_no"),ascending("order_no")))
-//							,limit(5)
-//						)
-//					).into(new ArrayList<Document>());
-//			
 			
 			for(Document doc : docList) {
 				vo = new BoardVo();
@@ -272,29 +268,7 @@ public class BoardDao implements IBoardDao{
 				vo.setViews( doc.getLong("views"));
 				list.add(vo);
 			}
-//			cursor = collection.find().iterator();
-//			try {
-//				while (cursor.hasNext()) {
-//					resultDoc = cursor.next();
-//					boardVo = new BoardVo();
-////					System.out.println(resultDoc.get("no").getClass().getName());
-//					long no = (long)(resultDoc.get("no")); 
-//					boardVo.setNo(no);
-////					boardVo.setName((String) resultDoc.get("name"));
-//					boardVo.setUserNo( resultDoc.getLong("user_no"));
-//					boardVo.setUserName( resultDoc.getString("user_name"));
-//					boardVo.setTitle( resultDoc.getString("title"));
-//					boardVo.setGroupNo( resultDoc.getLong("group_no"));
-//					boardVo.setOrderNo( resultDoc.getLong("order_no"));
-//					boardVo.setDepth( resultDoc.getLong("depth"));
-//					boardVo.setContents((String) resultDoc.get("contents"));
-//					boardVo.setRegDate(WebUtil.getFormatDate((Date) resultDoc.get("reg_date")));
-//					boardVo.setViews( resultDoc.getLong("views"));
-//					list.add(boardVo);
-//				}
-//			} finally {
-//				cursor.close();
-//			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -334,8 +308,8 @@ public class BoardDao implements IBoardDao{
 		
 	}
 	
+	// 조회수 증가
 	public boolean updateBoardViews(Long no) {
-		// 조회수 증가
 //					sql = "update board "
 //							+ "	set views = views + 1"
 //							+ " where no = ?;";
@@ -460,20 +434,8 @@ public class BoardDao implements IBoardDao{
 	}
 	@Override
 	public List<BoardVo> searchBoardListByKeyword(PagingBean pagingBean, String column, String keyword){
-		List<BoardVo> list = new ArrayList<BoardVo>();
-		Connection conn = null ;
-		PreparedStatement pstmt = null;
-		String sql = null;	
-		
-		try {
-//			conn = getConnection("slave1");
-			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
-			sql =  "set sql_safe_updates=0;";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.executeQuery();	
-			pstmt.close();
-			
-			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
+		/*
+		 * 			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
 					+ " date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views, u.name "
 					+ "	from board b "
 					+ " join user u "
@@ -490,47 +452,132 @@ public class BoardDao implements IBoardDao{
 			}
 			sql += "	order by group_no DESC, order_no ASC"
 					+ " LIMIT ?, ? ;";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, keyword);
-			pstmt.setInt(2, pagingBean.getStartRowNumber()-1);
-			pstmt.setInt(3, pagingBean.getEndRowNumber() - pagingBean.getStartRowNumber()+1);				
+		 */
+		List<BoardVo> list = new ArrayList<BoardVo>();
+
+		MongoClient client = null;
+		MongoDatabase db = null;
+		MongoCollection<Document> collection = null;
+		BoardVo vo = null;
+		try {
+			client = getClient();
+			db = getDB(client);
+			collection = getCollection(db);
 			
-			ResultSet rs = pstmt.executeQuery();
-			while(rs.next()) {
-				BoardVo vo = new BoardVo();
-				vo.setNo(rs.getLong(1));
-				vo.setUserNo(rs.getLong(2));
-				vo.setTitle(rs.getString(3));
-				vo.setGroupNo(rs.getLong(4));
-				vo.setOrderNo(rs.getLong(5));
-				vo.setDepth(rs.getLong(6));
-				vo.setRegDate(rs.getString(7));
-				vo.setViews(rs.getLong(8));
-				vo.setUserName(rs.getString(9));
-				list.add(vo);
-			}			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				if(conn != null) {
-					conn.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
+			// aggregation 수행 
+			
+//			lookup용 변수 , 파이프라인 준비  
+			List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
+			List<Bson> pipeline = asList(
+					match(
+							expr(
+									new Document("$eq", asList("$no", "$$uno"))
+								)
+						)
+					,project(
+							fields(include("name"),excludeId())
+							)
+					);
+			// 페이징 관련 부분
+			List<Document> docList = null;
+			int skipNum = pagingBean.getStartRowNumber()-1; 
+			//System.out.println(skipNum);
+			
+			// 사용자 이름 검색 시
+			if("user".equals(keyword)) {
+				if( skipNum >0) {
+					docList = collection.aggregate(
+							asList(								
+									match(new Document(column,new BsonRegularExpression(keyword)))
+									// 찾아볼 collection / 사용할 변수 / 변수가 사용될 pipeline / output field name
+									,lookup("user", variable, pipeline, "user_name")
+									// user_name 배열을 해체 ( [1,2,3] -> 1 / 2 / 3 다른 document로 분리
+									,unwind("$user_name")
+									// 새로운 field 추가 - nesting 된 field를 상위 field에 재지정
+									,new Document("$addFields",new Document("user_name","$user_name.name"))
+									// group number 별 내림차순 & order number 오름차순
+									,sort(orderBy(descending("group_no"),ascending("order_no")))
+									// 지정한 글 개수 만큼 skip - paging 처리
+									,skip(skipNum)
+									,limit(5)
+									)
+							).into(new ArrayList<Document>());				
+				}else {
+					docList = collection.aggregate(
+							asList(
+									match(new Document(column,new BsonRegularExpression(keyword)))
+									,lookup("user", variable, pipeline, "user_name")
+									,unwind("$user_name")
+									,new Document("$addFields",new Document("user_name","$user_name.name"))
+									,sort(orderBy(descending("group_no"),ascending("order_no")))
+									,limit(5)
+									)
+							).into(new ArrayList<Document>());
+				}				
+			// 본문 , 제목 검색 시
+			}else{
 				
-			}catch (Exception e) {
-				// TODO: handle exception
+				if( skipNum >0) {
+					docList = collection.aggregate(
+							asList(								
+									match(new Document(column,new BsonRegularExpression(".*"+keyword+".*")))
+									// 찾아볼 collection / 사용할 변수 / 변수가 사용될 pipeline / output field name
+									,lookup("user", variable, pipeline, "user_name")
+									// user_name 배열을 해체 ( [1,2,3] -> 1 / 2 / 3 다른 document로 분리
+									,unwind("$user_name")
+									// 새로운 field 추가 - nesting 된 field를 상위 field에 재지정
+									,new Document("$addFields",new Document("user_name","$user_name.name"))
+									// group number 별 내림차순 & order number 오름차순
+									,sort(orderBy(descending("group_no"),ascending("order_no")))
+									// 지정한 글 개수 만큼 skip - paging 처리
+									,skip(skipNum)
+									,limit(5)
+									)
+							).into(new ArrayList<Document>());				
+				}else {
+					docList = collection.aggregate(
+							asList(
+									match(new Document(column,new BsonRegularExpression(".*"+keyword+".*")))
+									,lookup("user", variable, pipeline, "user_name")
+									,unwind("$user_name")
+									,new Document("$addFields",new Document("user_name","$user_name.name"))
+									,sort(orderBy(descending("group_no"),ascending("order_no")))
+									,limit(5)
+									)
+							).into(new ArrayList<Document>());
+				}
 			}
+			
+			
+			for(Document doc : docList) {
+				vo = new BoardVo();
+				long no = (long)(doc.get("no")); 
+				vo.setNo(no);
+				vo.setUserNo( doc.getLong("user_no"));
+				vo.setUserName( doc.getString("user_name"));
+				vo.setTitle( doc.getString("title"));
+				vo.setGroupNo( doc.getLong("group_no"));
+				vo.setOrderNo( doc.getLong("order_no"));
+				vo.setDepth( doc.getLong("depth"));
+				vo.setContents((String) doc.get("contents"));
+				vo.setRegDate(WebUtil.getFormatDate((Date) doc.get("reg_date")));
+				vo.setViews( doc.getLong("views"));
+				list.add(vo);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			client.close();
 		}
 		return list;
+		
 	}
 
+//		// 게시물 전체 내용 가져오기
 	@Override
 	public int selectBoardListCnt() {
 //		https://gangnam-americano.tistory.com/18
-//		// 게시물 전체 내용 가져오기
 //		sql =  " select count(no) "
 //				+ "	from board;";
 //		
@@ -554,15 +601,8 @@ public class BoardDao implements IBoardDao{
 	// 검색어 조건에 맞는 게시글 수를 가져온다. 
 	@Override
 	public int selectBoardListCnt(String column, String keyword) {
-		// TODO Auto-generated method stub
-		Connection conn = null ;
-		PreparedStatement pstmt = null;
-		String sql = null;
-		int result = 0;
-		try {
-//			conn = getConnection("slave1");	
-			
-			// 게시물 전체 내용 가져오기
+		/*
+		 * 			// 게시물 전체 내용 가져오기
 			sql =  " select count(1) "
 					+ "	from board "; 
 			if("title".equals(column)){
@@ -580,23 +620,27 @@ public class BoardDao implements IBoardDao{
 			if(rs.next()) {
 				result = rs.getInt(1);
 			}
-			
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				if(conn != null) {
-					conn.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				
-			}catch (Exception e) {
-				// TODO: handle exception
+		 */
+//		return result;
+		MongoClient client = null;
+		MongoDatabase db = null;
+		MongoCollection<Document> collection = null;
+		long result = -1L;
+		try {
+			client = getClient();
+			db = getDB(client);
+			collection = getCollection(db);
+			// 유저 이름은 전부 일치 , 제목/내용은 포함하는 것만 필터링하도록 설정 
+			if("user".equals(column)) {
+				result = collection.countDocuments(regex(column, Pattern.quote(keyword) ));			
+			}else {
+				result = collection.countDocuments(regex(column, ".*" + Pattern.quote(keyword)+".*"));			
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			client.close();
 		}
-		return result;
+		return WebUtil.longToInt(result);
 	}
 }

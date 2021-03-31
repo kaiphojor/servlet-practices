@@ -1,5 +1,4 @@
 package com.bitacademy.mongodbsite.dao.test;
-import static com.mongodb.client.model.Aggregates.replaceWith;
 import static com.mongodb.client.model.Aggregates.lookup;
 import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Aggregates.project;
@@ -11,6 +10,7 @@ import static com.mongodb.client.model.Filters.gt;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
@@ -21,13 +21,14 @@ import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.inc;
 import static com.mongodb.client.model.Updates.set;
 import static java.util.Arrays.asList;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.bson.BsonRegularExpression;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -40,11 +41,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.UnwindOptions;
 import com.mongodb.client.model.Variable;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import com.mongodb.internal.operation.AggregateOperation;
 
 public class ConnectMongoDbTest {
 
@@ -84,13 +83,70 @@ public class ConnectMongoDbTest {
 //		joinCollection(database);
 //		findDocByCondition(database,0L);
 		
-		for(int i=0; i< 20; i++) {
-			addTest(i);
-		}
+//		for(int i=0; i< 20; i++) {
+//			addTest(i);
+//		}
 		System.out.println(collection.countDocuments());
-		findAllDoc(collection);
+//		findDocByStringMatch(collection,"파국");
+		countByStringMatch(collection,"contents","내용");
+//		findAllDoc(collection);
 		
 	}
+	
+	private static void countByStringMatch(MongoCollection<Document> collection,String column, String keyword) {
+		long result = -1L;
+//		.find(regex(column, ".*" + Pattern.quote(keyword)+".*"))
+		if("user".equals(column)) {
+			result = collection.countDocuments(regex(column, Pattern.quote(keyword) ));			
+		}else {
+			result = collection.countDocuments(regex(column, ".*" + Pattern.quote(keyword)+".*"));			
+		}
+		System.out.println(result);
+	}
+
+	private static void findDocByStringMatch(MongoCollection<Document> collection, String string) {
+		BoardVo vo = null;
+		List<Variable<String>> variable = asList(
+				new Variable<>("uno", "$user_no")
+				);
+		List<Bson> pipeline = asList(
+				match(
+						expr(
+								new Document("$eq", asList("$no", "$$uno"))
+							)
+				)				
+				,project(
+						fields(include("name"),excludeId())
+						)
+				);
+		List<Document> documents = collection.aggregate(
+				asList(
+//						match(new Document("contents",asList("$in",string)))
+						match(new Document("title",new BsonRegularExpression(".*"+string+".*")))
+//						match(new Document("title",new Document("$regex",".*"+Pattern.quote(string)+".*")))
+//						match(new Document("title",new Document("$regex","/파국/").append("$options","gi")))
+						,lookup("user", variable, pipeline, "user_name")
+						,unwind("$user_name")
+						,new Document("$addFields",new Document("user_name","$user_name.name"))
+					)
+				).into(new ArrayList<Document>());
+		
+		for(Document doc : documents) {
+			vo = new BoardVo();
+			vo.setNo(doc.getLong("no"));
+			vo.setUserNo( doc.getLong("user_no"));
+			vo.setUserName( doc.getString("user_name"));
+			vo.setTitle( doc.getString("title"));
+			vo.setGroupNo( doc.getLong("group_no"));
+			vo.setOrderNo( doc.getLong("order_no"));
+			vo.setDepth( doc.getLong("depth"));
+			vo.setContents((String) doc.get("contents"));
+			vo.setRegDate(WebUtil.getFormatDate((Date) doc.get("reg_date")));
+			vo.setViews( doc.getLong("views"));
+			System.out.println(vo.toString());
+		}
+	}
+
 	private static void findDocByCondition(MongoDatabase database,Long no) {
 		MongoCollection<Document> collection = database.getCollection("board");
 		BoardVo vo = null;
