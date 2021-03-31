@@ -484,17 +484,17 @@ public class BoardDao implements IBoardDao{
 			//System.out.println(skipNum);
 			
 			// 사용자 이름 검색 시
-			if("user".equals(keyword)) {
+			if("user".equals(column)) {
 				if( skipNum >0) {
 					docList = collection.aggregate(
 							asList(								
-									match(new Document(column,new BsonRegularExpression(keyword)))
 									// 찾아볼 collection / 사용할 변수 / 변수가 사용될 pipeline / output field name
-									,lookup("user", variable, pipeline, "user_name")
+									lookup("user", variable, pipeline, "user_name")
 									// user_name 배열을 해체 ( [1,2,3] -> 1 / 2 / 3 다른 document로 분리
 									,unwind("$user_name")
 									// 새로운 field 추가 - nesting 된 field를 상위 field에 재지정
 									,new Document("$addFields",new Document("user_name","$user_name.name"))
+									,match(new Document("user_name",new BsonRegularExpression(keyword)))
 									// group number 별 내림차순 & order number 오름차순
 									,sort(orderBy(descending("group_no"),ascending("order_no")))
 									// 지정한 글 개수 만큼 skip - paging 처리
@@ -505,10 +505,10 @@ public class BoardDao implements IBoardDao{
 				}else {
 					docList = collection.aggregate(
 							asList(
-									match(new Document(column,new BsonRegularExpression(keyword)))
-									,lookup("user", variable, pipeline, "user_name")
+									lookup("user", variable, pipeline, "user_name")
 									,unwind("$user_name")
 									,new Document("$addFields",new Document("user_name","$user_name.name"))
+									,match(new Document("user_name",new BsonRegularExpression(keyword)))
 									,sort(orderBy(descending("group_no"),ascending("order_no")))
 									,limit(5)
 									)
@@ -601,6 +601,7 @@ public class BoardDao implements IBoardDao{
 	// 검색어 조건에 맞는 게시글 수를 가져온다. 
 	@Override
 	public int selectBoardListCnt(String column, String keyword) {
+		
 		/*
 		 * 			// 게시물 전체 내용 가져오기
 			sql =  " select count(1) "
@@ -632,7 +633,14 @@ public class BoardDao implements IBoardDao{
 			collection = getCollection(db);
 			// 유저 이름은 전부 일치 , 제목/내용은 포함하는 것만 필터링하도록 설정 
 			if("user".equals(column)) {
-				result = collection.countDocuments(regex(column, Pattern.quote(keyword) ));			
+				MongoCollection<Document> userCollection = getCollection(db,"user");
+				List<Document> docList = userCollection.find(eq("name",keyword)).into(new ArrayList<Document>());
+				if(docList.isEmpty()) {
+					result = 0L;
+				}else {
+					Long userNo = docList.get(0).getLong("no");
+					result = collection.countDocuments(eq("user_no", userNo ));							
+				}
 			}else {
 				result = collection.countDocuments(regex(column, ".*" + Pattern.quote(keyword)+".*"));			
 			}
@@ -641,6 +649,7 @@ public class BoardDao implements IBoardDao{
 		} finally {
 			client.close();
 		}
+//		System.out.println(result);
 		return WebUtil.longToInt(result);
 	}
 }

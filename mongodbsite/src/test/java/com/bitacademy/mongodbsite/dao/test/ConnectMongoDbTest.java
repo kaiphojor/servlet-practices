@@ -88,7 +88,7 @@ public class ConnectMongoDbTest {
 //		}
 		System.out.println(collection.countDocuments());
 //		findDocByStringMatch(collection,"파국");
-		countByStringMatch(collection,"contents","내용");
+		countByStringMatch(collection,"user","jenkins");
 //		findAllDoc(collection);
 		
 	}
@@ -97,7 +97,16 @@ public class ConnectMongoDbTest {
 		long result = -1L;
 //		.find(regex(column, ".*" + Pattern.quote(keyword)+".*"))
 		if("user".equals(column)) {
-			result = collection.countDocuments(regex(column, Pattern.quote(keyword) ));			
+			MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+			MongoDatabase database = mongoClient.getDatabase("webdb");
+			MongoCollection<Document> user = database.getCollection("user");
+			List<Document> docList = user.find(eq("name",keyword)).into(new ArrayList<Document>());
+			if(docList.isEmpty()) {
+				result = 0L;
+			}else {
+				Long userNo = docList.get(0).getLong("no");
+				result = collection.countDocuments(eq("user_no", userNo ));							
+			}
 		}else {
 			result = collection.countDocuments(regex(column, ".*" + Pattern.quote(keyword)+".*"));			
 		}
