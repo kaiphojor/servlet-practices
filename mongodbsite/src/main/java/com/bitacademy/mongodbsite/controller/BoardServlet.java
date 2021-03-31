@@ -112,6 +112,7 @@ public class BoardServlet extends HttpServlet {
 				keyword = URLDecoder.decode(keyword,"UTF-8");
 				totalCount = new BoardDao().selectBoardListCnt(category,keyword);
 			}
+			//TODO : paging 이 1페이지에서 번호 3 ~ 7 로 고정되어 나온다.
 			String pageNo = request.getParameter("page");
 			PagingBean pagingBean = null;			
 			if(pageNo == null) {

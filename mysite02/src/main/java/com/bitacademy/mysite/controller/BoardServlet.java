@@ -119,6 +119,7 @@ public class BoardServlet extends HttpServlet {
 			}else {
 				pagingBean = new PagingBean(totalCount, Integer.parseInt(pageNo)); 
 			}
+
 			// 검색어 유무에 관련없이 paging 처리해서 목록을 출력한다. 
 			if(keyword== null) {
 				list = new BoardDao().getBoardPageList(pagingBean);				

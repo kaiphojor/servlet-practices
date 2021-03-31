@@ -22,6 +22,8 @@
 					<tr>
 						<td class="label">글쓴이</td>
 						<td>${vo.userName}</td>
+					</tr>
+					<tr>
 						<td class="label">조회수</td>
 						<td>${vo.views}</td>
 					</tr>

@@ -243,17 +243,43 @@ public class BoardDao implements IBoardDao{
 							)
 					);
 			
-			List<Document> docList = collection.aggregate(
-					asList(
-							lookup("user", variable, pipeline, "user_name")
-							,unwind("$user_name")
-							,new Document("$addFields",new Document("user_name","$user_name.name"))
-							,sort(orderBy(descending("group_no"),ascending("order_no")))
-							//,skip(pagingBean.getStartRowNumber()-1-1)
-							,limit(5)
-						)
-					).into(new ArrayList<Document>());
+			List<Document> docList = null;
+			int skipNum = pagingBean.getStartRowNumber()-1; 
+			//System.out.println(skipNum);
+			if( skipNum >0) {
+				docList = collection.aggregate(
+						asList(
+								lookup("user", variable, pipeline, "user_name")
+								,unwind("$user_name")
+								,new Document("$addFields",new Document("user_name","$user_name.name"))
+								,sort(orderBy(descending("group_no"),ascending("order_no")))
+								,skip(skipNum)
+								,limit(5)
+							)
+						).into(new ArrayList<Document>());				
+			}else {
+				docList = collection.aggregate(
+						asList(
+								lookup("user", variable, pipeline, "user_name")
+								,unwind("$user_name")
+								,new Document("$addFields",new Document("user_name","$user_name.name"))
+								,sort(orderBy(descending("group_no"),ascending("order_no")))
+								,limit(5)
+							)
+						).into(new ArrayList<Document>());
+			}
 			
+//			List<Document> docList = collection.aggregate(
+//					asList(
+//							skip(skipNum)
+//							,lookup("user", variable, pipeline, "user_name")
+//							,unwind("$user_name")
+//							,new Document("$addFields",new Document("user_name","$user_name.name"))
+//							,sort(orderBy(descending("group_no"),ascending("order_no")))
+//							,limit(5)
+//						)
+//					).into(new ArrayList<Document>());
+//			
 			
 			for(Document doc : docList) {
 				vo = new BoardVo();
