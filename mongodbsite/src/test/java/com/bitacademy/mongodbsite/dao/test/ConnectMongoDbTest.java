@@ -88,24 +88,33 @@ public class ConnectMongoDbTest {
 	// join 하기
 	private static void joinCollection(MongoDatabase database) {
 		MongoCollection<Document> collection = database.getCollection("board");
-		MongoCollection<Document> userCollection = database.getCollection("user");
 		// TODO Auto-generated method stub
-		List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
 		
 //      project(computed("user_name", "$name"));
-		List<Bson> pipeline = asList(match(expr(new Document("$eq", asList("$no", "$$uno")))),
-				project(fields(include("name"), excludeId())));
-		Bson pipe = lookup("user", variable, pipeline, "user_name");
+		List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
+		List<Bson> pipeline = asList(
+				match(
+						expr(
+								new Document("$eq", asList("$no", "$$uno"))
+							)
+					)
+				,project(
+						fields(include("name"),excludeId())
+						)
+				);
+		//Bson pipe = lookup("user", variable, pipeline, "user_name");
 		
 		MongoCursor<Document> cur = collection.aggregate(
 				asList(
 						lookup("user"
 								,variable
 								,pipeline
-								, "user")
-						,unwind("$user")
+								, "user_name")
+						,unwind("$user_name")
+						,new Document("$addFields",new Document("user_name","$user_name.name"))
 //						,unwind("$user.name")
-						,project(fields(include("user.name","no","user_no","title","group_no", "order_no","depth")))
+//						,unwind("$user.name")
+						//,project(fields(include("user.name","no","user_no","title","group_no", "order_no","depth")))
 						//,unwind("$name.name",new UnwindOptions().includeArrayIndex("name"))
 					)
 				).iterator();

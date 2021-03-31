@@ -243,39 +243,71 @@ public class BoardDao implements IBoardDao{
 			 * https://docs.mongodb.com/manual/tutorial/aggregation-with-user-preference-data/
 			 */
 			
-			List<Document> docList = collection
-					.find()
-					.sort(orderBy(descending("group_no"),ascending("order_no")))
-					.limit(5)
-					.into(new ArrayList<Document>());
+//			List<Document> docList = collection
+//					.find()
+//					.sort(orderBy(descending("group_no"),ascending("order_no")))
+//					.limit(5)
+//					.into(new ArrayList<Document>());
+			
+			List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
+			List<Bson> pipeline = asList(
+					match(
+							expr(
+									new Document("$eq", asList("$no", "$$uno"))
+								)
+						)
+					,project(
+							fields(include("name"),excludeId())
+							)
+					);
+			
+			List<Document> docList = collection.aggregate(
+					asList(
+							lookup("user", variable, pipeline, "user_name")
+							,unwind("$user_name")
+							,new Document("$addFields",new Document("user_name","$user_name.name"))
+						)
+					).into(new ArrayList<Document>());
+			
+			
 			for(Document doc : docList) {
 				vo = new BoardVo();
-				vo.setNo(doc.getLong("no"));
-//				vo.setU
+				long no = (long)(doc.get("no")); 
+				vo.setNo(no);
+				vo.setUserNo( doc.getLong("user_no"));
+				vo.setUserName( doc.getString("user_name"));
+				vo.setTitle( doc.getString("title"));
+				vo.setGroupNo( doc.getLong("group_no"));
+				vo.setOrderNo( doc.getLong("order_no"));
+				vo.setDepth( doc.getLong("depth"));
+				vo.setContents((String) doc.get("contents"));
+				vo.setRegDate(WebUtil.getFormatDate((Date) doc.get("reg_date")));
+				vo.setViews( doc.getLong("views"));
+				list.add(vo);
 			}
-			cursor = collection.find().iterator();
-			try {
-				while (cursor.hasNext()) {
-					resultDoc = cursor.next();
-					boardVo = new BoardVo();
-//					System.out.println(resultDoc.get("no").getClass().getName());
-					long no = (long)(resultDoc.get("no")); 
-					boardVo.setNo(no);
-//					boardVo.setName((String) resultDoc.get("name"));
-					boardVo.setUserNo( resultDoc.getLong("user_no"));
+//			cursor = collection.find().iterator();
+//			try {
+//				while (cursor.hasNext()) {
+//					resultDoc = cursor.next();
+//					boardVo = new BoardVo();
+////					System.out.println(resultDoc.get("no").getClass().getName());
+//					long no = (long)(resultDoc.get("no")); 
+//					boardVo.setNo(no);
+////					boardVo.setName((String) resultDoc.get("name"));
+//					boardVo.setUserNo( resultDoc.getLong("user_no"));
 //					boardVo.setUserName( resultDoc.getString("user_name"));
-					boardVo.setTitle( resultDoc.getString("title"));
-					boardVo.setGroupNo( resultDoc.getLong("group_no"));
-					boardVo.setOrderNo( resultDoc.getLong("order_no"));
-					boardVo.setDepth( resultDoc.getLong("depth"));
-					boardVo.setContents((String) resultDoc.get("contents"));
-					boardVo.setRegDate(WebUtil.getFormatDate((Date) resultDoc.get("reg_date")));
-					boardVo.setViews( resultDoc.getLong("views"));
-					list.add(boardVo);
-				}
-			} finally {
-				cursor.close();
-			}
+//					boardVo.setTitle( resultDoc.getString("title"));
+//					boardVo.setGroupNo( resultDoc.getLong("group_no"));
+//					boardVo.setOrderNo( resultDoc.getLong("order_no"));
+//					boardVo.setDepth( resultDoc.getLong("depth"));
+//					boardVo.setContents((String) resultDoc.get("contents"));
+//					boardVo.setRegDate(WebUtil.getFormatDate((Date) resultDoc.get("reg_date")));
+//					boardVo.setViews( resultDoc.getLong("views"));
+//					list.add(boardVo);
+//				}
+//			} finally {
+//				cursor.close();
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
