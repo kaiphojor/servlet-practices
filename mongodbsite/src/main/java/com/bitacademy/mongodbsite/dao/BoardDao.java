@@ -266,6 +266,9 @@ public class BoardDao implements IBoardDao{
 							lookup("user", variable, pipeline, "user_name")
 							,unwind("$user_name")
 							,new Document("$addFields",new Document("user_name","$user_name.name"))
+							,sort(orderBy(descending("group_no"),ascending("order_no")))
+							,skip(0)
+							,limit(5)
 						)
 					).into(new ArrayList<Document>());
 			

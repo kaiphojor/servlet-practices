@@ -108,7 +108,7 @@ tr:nth-child(even) {
 		var url = userURL + "/AjaxRequest.jsp?getUrl=";
 		var subURL = "http://openAPI.songpa.seoul.kr:8088";
 		subURL += "/71456d5164666f753539587572624f";
-		subURL += "/xml";
+		subURL += "/json";
 		subURL += "/SpModelRestaurantDesignate";
 		subURL += "/1";
 		subURL += "/"+ limit + "/";
@@ -118,10 +118,18 @@ tr:nth-child(even) {
 			"url" : url,
 			"type" : "GET",
 			"success" : function(result) {
-				$('#result').innerHTML = result;
-				x = result.getElementsByTagName("SpModelRestaurantDesignate")[0];
-				document.getElementById('totalCount').innerHTML = x.getElementsByTagName("list_total_count")[0].childNodes[0].nodeValue;
-				var rows = result.getElementsByTagName("row"); 
+				//console.log(result['SpModelRestaurantDesignate']);
+				//console.log(result.SpModelRestaurantDesignate);
+				var resObj = result.SpModelRestaurantDesignate;
+				//console.log(resObj.list_total_count);
+				//console.log(resObj.row);
+				//var resArray = 
+				//console.log("success : " + result);
+				
+				//$('#result').innerHTML = result;
+				//x = result.getElementsByTagName("SpModelRestaurantDesignate")[0];
+				document.getElementById('totalCount').innerHTML = resObj.list_total_count;
+				var rows = resObj.row;
 				var txt = "";
 				if (result == null || result == "") {
 					alert("해당 주소로 얻을수 있는 좌표가 없습니다. 주소값을 다시 입력하세요");
@@ -150,27 +158,27 @@ tr:nth-child(even) {
 						}
 						// 테이블 내용 구성 
 						txt += "<tr>";
-						txt += "<th>"+value.getElementsByTagName("CGG_CODE")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("ASGN_YY")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("ASGN_SNO")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("APPL_YMD")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("ASGN_YMD")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("UPSO_NM")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("SITE_ADDR_RD")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("SITE_ADDR")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("PERM_NT_NO")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("SNT_UPTAE_NM")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("MAIN_EDF")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("TRDP_AREA")[0].childNodes[0].nodeValue+"</th>";
-						txt += "<th>"+value.getElementsByTagName("ADMDNG_NM")[0].childNodes[0].nodeValue+"</th>";
+						txt += "<th>"+value.CGG_CODE+"</th>";
+						txt += "<th>"+value.ASGN_YY+"</th>";
+						txt += "<th>"+value.ASGN_SNO+"</th>";
+						txt += "<th>"+value.APPL_YMD+"</th>";
+						txt += "<th>"+value.ASGN_YMD+"</th>";
+						txt += "<th>"+value.UPSO_NM+"</th>";
+						txt += "<th>"+value.SITE_ADDR_RD+"</th>";
+						txt += "<th>"+value.SITE_ADDR+"</th>";
+						txt += "<th>"+value.PERM_NT_NO+"</th>";
+						txt += "<th>"+value.SNT_UPTAE_NM+"</th>";
+						txt += "<th>"+value.MAIN_EDF+"</th>";
+						txt += "<th>"+value.TRDP_AREA+"</th>";
+						txt += "<th>"+value.ADMDNG_NM+"</th>";
 												
 						// 값이 존재하지 않을 때 예외 처리
-						var isFacility = value.getElementsByTagName("GRADE_FACIL_GBN")[0].childNodes[0];
+						var isFacility = value.GRADE_FACIL_GBN;
 						//console.log(isFacility);
-						var isFacilityVal = typeof isFacility != "undefined" ? isFacility.nodeValue : "없음";						
+						var isFacilityVal = isFacility != "" ? isFacility : "없음";						
 						txt += "<th>"+isFacilityVal+"</th>";
-						var isTelNo = value.getElementsByTagName("UPSO_SITE_TELNO")[0].childNodes[0];
-						var isTelNoVal = typeof isTelNo != "undefined" ? isTelNo.nodeValue : "미기재";						
+						var isTelNo = value.UPSO_SITE_TELNO;
+						var isTelNoVal = isTelNo != "" ? isTelNo : "미기재";						
 						txt += "<th>"+isTelNoVal+"</th>";						
 						txt += "</tr>";
 					});
@@ -178,7 +186,7 @@ tr:nth-child(even) {
 				}
 			},
 			"async" : "true",
-			"dataType" : "xml",
+			"dataType" : "json",
 			"error" : function(x, o, e) {
 				$('#result').innerHTML = x.responseText;
 				console.log(x.responseText);

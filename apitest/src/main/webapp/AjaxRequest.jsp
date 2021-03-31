@@ -20,7 +20,11 @@ while ((inputLine = in.readLine()) != null) {
 */
 //System.out.println("buffer : " + buffer);
 in.close();
-response.setContentType("application/xml");
+if(request.getParameter("getUrl").contains("json")){
+	response.setContentType("application/json");	
+}else{
+	response.setContentType("application/xml");	
+}
 out.print(buffer);
 /*
 import="java.io.*,java.net.*" 
