@@ -197,7 +197,7 @@ tr:nth-child(even) {
 </script>
 </head>
 <body>	
-	<h1>(공공데이터포털)년,월을 입력해서 공휴일을 확인</h1>
+	<h1>(공공데이터포털-XML)년,월을 입력해서 공휴일을 확인</h1>
 	<input type="hidden" id="serviceKey"
 		value="eYB0JZN3NsY9SlT3WN3qNZm0%2BCYERztmFWTaz4pBpiMgvYx2qcKHA8o3Xbx7d7lDTdj5J2XA4sEMLVG%2BW8Ih%2Bg%3D%3D" />
 	<br /> 년 :
@@ -207,7 +207,7 @@ tr:nth-child(even) {
 	<br />
 	<input type="button" value="공휴일 검색" onclick="fnHoliday()" />
 	<table id='result'></table>
-	<h1>(서울열린데이터광장API)송파구 모범음식점 목록</h1>
+	<h1>(서울열린데이터광장API-JSON)송파구 모범음식점 목록</h1>
 	<br /> 출력할 음식점 개수 :
 	<input type="text" id="count" value="" placeholder="음식점 개수 입력(예:3)"/>
 	<br />
