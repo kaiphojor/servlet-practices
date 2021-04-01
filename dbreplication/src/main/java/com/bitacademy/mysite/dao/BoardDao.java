@@ -31,8 +31,8 @@ public class BoardDao implements IBoardDao{
 		Map<String, Integer> portMap = new HashMap<>();
 		portMap.put("master", 3307);
 		portMap.put("slave1", 3308);
-		portMap.put("slave2", 3309);
-		portMap.put("slave3", 3310);
+//		portMap.put("slave2", 3309);
+//		portMap.put("slave3", 3310);
 		Connection conn = null;
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -55,8 +55,8 @@ public class BoardDao implements IBoardDao{
 		PreparedStatement pstmt = null;
 		String sql = "";
 		try {
-			conn = getConnection();	
-//			conn = getConnection("master");	
+//			conn = getConnection();	
+			conn = getConnection("master");	
 			
 			sql =  "insert into board(user_no, title, group_no, order_no, "
 				+ " depth, contents, reg_date) "
@@ -93,8 +93,8 @@ public class BoardDao implements IBoardDao{
 		PreparedStatement pstmt = null;
 		String sql = "";
 		try {
-			conn = getConnection();
-//			conn = getConnection("master");
+//			conn = getConnection();
+			conn = getConnection("master");
 			
 			// update 문에서 key column 이외의 column을 where절에서 사용하기 위해 필요하다.
 			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
@@ -154,8 +154,8 @@ public class BoardDao implements IBoardDao{
 		String sql = null;	
 		
 		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			//
 			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
 			sql =  "set sql_safe_updates=0;";
@@ -216,8 +216,8 @@ public class BoardDao implements IBoardDao{
 		PreparedStatement pstmt = null;
 		String sql = "";
 		try {
-			conn = getConnection();						
-//			conn = getConnection("master");						
+//			conn = getConnection();						
+			conn = getConnection("master");						
 			
 			// 해당 그룹 내에서 답글이 없는 글(마지막 순서) 만 삭제 가능하다.
 			sql = " delete from board "
@@ -253,8 +253,8 @@ public class BoardDao implements IBoardDao{
 		String sql = null;
 		BoardVo vo = null;
 		try {
-			conn = getConnection();	
-//			conn = getConnection("master");	
+//			conn = getConnection();	
+			conn = getConnection("master");	
 			// 조회수 증가
 			sql = "update board "
 					+ "	set views = views + 1"
@@ -288,8 +288,8 @@ public class BoardDao implements IBoardDao{
 		String sql = null;
 		BoardVo vo = null;
 		try {
-			conn = getConnection();	
-//			conn = getConnection("slave1");	
+//			conn = getConnection();	
+			conn = getConnection("slave1");	
 			
 			// 게시물 전체 내용 가져오기
 			sql =  " select b.no, b.user_no, b.title, b.group_no, b.order_no, "
@@ -338,8 +338,8 @@ public class BoardDao implements IBoardDao{
 		PreparedStatement pstmt = null;
 		String sql = null;
 		try {
-			conn = getConnection();	
-//			conn = getConnection("master");	
+//			conn = getConnection();	
+			conn = getConnection("master");	
 			// 조회수 증가
 			sql = "update board "
 					+ "	set title = ?, contents = ? "
@@ -376,8 +376,8 @@ public class BoardDao implements IBoardDao{
 		String sql = null;	
 		
 		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			// 변경사항은 mysql 해당 DB세션에서만 유지된다.
 			sql =  "set sql_safe_updates=0;";
 			pstmt = conn.prepareStatement(sql);
@@ -446,8 +446,8 @@ public class BoardDao implements IBoardDao{
 		String sql = null;
 		int result = 0;
 		try {
-			conn = getConnection();	
-//			conn = getConnection("slave1");	
+//			conn = getConnection();	
+			conn = getConnection("slave1");	
 			
 			// 게시물 전체 내용 가져오기
 			sql =  " select count(no) "
@@ -487,8 +487,8 @@ public class BoardDao implements IBoardDao{
 		String sql = null;
 		int result = 0;
 		try {
-			conn = getConnection();	
-//			conn = getConnection("slave1");	
+//			conn = getConnection();	
+			conn = getConnection("slave1");	
 			
 			// 게시물 전체 내용 가져오기
 			sql =  " select count(1) "

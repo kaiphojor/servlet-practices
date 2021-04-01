@@ -14,6 +14,43 @@ import com.bitacademy.mysite.vo.GuestbookVo;
 import com.bitacademy.mysite.vo.UserVo;
 
 public class UserDao {
+	
+	// jdbc 연동을 통한 mysql connection 획득, sql execption은 각 메소드에서 처리한다.
+	public static Connection getConnection() throws SQLException {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:3306/webdb?characterEncoding=utf8&serverTimezone=UTC";
+			conn = DriverManager.getConnection(url,"webdb","webdb");
+		} catch (ClassNotFoundException e) {
+			System.out.println("error " + e);
+		}		
+		return conn;
+	}
+	
+	// db 복제를 위한 getConnection
+	public Connection getConnection(String dbName) throws SQLException {
+		// connection map
+		Map<String, Integer> portMap = new HashMap<>();
+		portMap.put("master", 3307);
+		portMap.put("slave1", 3308);
+//		portMap.put("slave2", 3309);
+//		portMap.put("slave3", 3310);
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:"+portMap.get(dbName)+"/webdb?characterEncoding=utf8&serverTimezone=UTC";
+			if("master".equals(dbName)) {
+				conn = DriverManager.getConnection(url, "root", "masterpw");
+			}else{
+				conn = DriverManager.getConnection(url, "root", "slavepw");
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("error " + e);
+		}
+		return conn;
+	}
+	
 	// 이메일, 비밀번호가 일치하는 user를 가져온다. 
 	public UserVo findByEmailAndPassword(UserVo vo) {
 		Connection conn = null;
@@ -21,8 +58,8 @@ public class UserDao {
 		UserVo userVo = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name  "
 					+ "	from user "
 					+ "	where email=? and password=?;";
@@ -65,8 +102,8 @@ public class UserDao {
 		UserVo userVo = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select name, email, password, gender "
 					+ "	from user "
 					+ "	where no = ?;";
@@ -112,8 +149,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
-//			conn = getConnection("master");
+//			conn = getConnection();
+			conn = getConnection("master");
 			String sql =  "insert "
 					+ "	into user "
 					+ "	values(null,?,?,?,?,now());";
@@ -151,8 +188,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
-//			conn = getConnection("master");
+//			conn = getConnection();
+			conn = getConnection("master");
 			String sql =  "update user "
 					+ "	set name = ?, email = ?, password = ?, gender = ? "
 					+ "	where no = ?;";
@@ -190,8 +227,8 @@ public class UserDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name  "
 					+ "	from user "
 					+ "	where email=? and password=?;";
@@ -221,41 +258,7 @@ public class UserDao {
 	}
 	
 	
-	// jdbc 연동을 통한 mysql connection 획득, sql execption은 각 메소드에서 처리한다.
-	public static Connection getConnection() throws SQLException {
-		Connection conn = null;
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:3306/webdb?characterEncoding=utf8&serverTimezone=UTC";
-			conn = DriverManager.getConnection(url,"webdb","webdb");
-		} catch (ClassNotFoundException e) {
-			System.out.println("error " + e);
-		}		
-		return conn;
-	}
-	
-	// db 복제를 위한 getConnection
-	public Connection getConnection(String dbName) throws SQLException {
-		// connection map
-		Map<String, Integer> portMap = new HashMap<>();
-		portMap.put("master", 3307);
-		portMap.put("slave1", 3308);
-		portMap.put("slave2", 3309);
-		portMap.put("slave3", 3310);
-		Connection conn = null;
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:"+portMap.get(dbName)+"/webdb?characterEncoding=utf8&serverTimezone=UTC";
-			if("master".equals(dbName)) {
-				conn = DriverManager.getConnection(url, "root", "masterpw");
-			}else{
-				conn = DriverManager.getConnection(url, "root", "slavepw");
-			}
-		} catch (ClassNotFoundException e) {
-			System.out.println("error " + e);
-		}
-		return conn;
-	}
+
 	
 
 	// 전체 방명록 조회, 날짜는 sql에서 String format 반환됨
@@ -264,8 +267,8 @@ public class UserDao {
 		Connection conn = null ;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
-//			conn = getConnection("slave1");
+//			conn = getConnection();
+			conn = getConnection("slave1");
 			String sql =  "select no, name,  date_format(reg_date,'%Y-%m-%d %H:%i:%s'),contents "
 					+ "	from guestbook "
 					+ "	order by reg_date desc;";
@@ -306,8 +309,8 @@ public class UserDao {
 		PreparedStatement pstmt = null;
 		boolean result = false;
 		try {
-			conn = getConnection(); 
-//			conn = getConnection("master"); 
+//			conn = getConnection(); 
+			conn = getConnection("master"); 
 			String sql =  "delete from guestbook "
 					+ "	where no = ? and password = ?;";
 			
