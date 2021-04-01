@@ -56,5 +56,6 @@
 		<module>mongosite</module>
 		<module>mongodbsite</module>
 		<module>apitest</module>
+		<module>dbreplication</module>
 	</modules>
 </project>
