@@ -69,14 +69,12 @@ public class BoardDao implements IBoardDao{
 	// 게시물 입력 (답글 제외)
 	public boolean insertBoard(BoardVo vo) {
 		/*
+		 * 원본 SQL
 		 * 			sql =  "insert into board(user_no, title, group_no, order_no, "
 				+ " depth, contents, reg_date) "
 				+ "	values(?, ?, ifnull((select max(group_no)+1 from board b),1), 1, "
 				+ " 0, ?, now());";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, vo.getUserNo());
-			pstmt.setString(2, vo.getTitle());
-			pstmt.setString(3, vo.getContents());
+
 		 */
 		MongoClient client = null;
 		MongoDatabase db = null;
@@ -86,7 +84,7 @@ public class BoardDao implements IBoardDao{
 			client = getClient();
 			db = getDB(client);
 			collection = getCollection(db);
-
+			
 			Long no = updateCounter(db);
 			Long order_no = WebUtil.intToLong(1);
 			Document groupNoDoc = collection.find().sort(descending("group_no")).first();
@@ -115,32 +113,20 @@ public class BoardDao implements IBoardDao{
 	@Override
 	public boolean insertBoardReply(BoardVo originVo, BoardVo vo) {
 		/*
-		 * 			// 답글 작성시 먼저 수행해야할 구문
+			원본 SQL
+ 			// 답글 작성시 먼저 수행해야할 구문
 			// 같은 그룹 에서 원글보다 나중에 달린 글들의 순서를 하나씩 증가시켜서 답글이 달릴 자리(순서)를 확보한다. 
 			sql = "update board "
 					+ "	set order_no = order_no + 1 "
 					+ " where group_no = ? and order_no >= ? + 1;";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, originVo.getGroupNo());
-			pstmt.setLong(2, originVo.getOrderNo());
-			pstmt.executeUpdate();	
-			pstmt.close();		
 			
 			// insert 수행 (원글의 순서, 깊이를 이용)
 			sql =  "insert into board(user_no, title, group_no, order_no, "
 					+ " depth, contents, reg_date) "
 					+ "	values(?, ?, ?, ?+1, "
 					+ " ?+1, ?, now());";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, vo.getUserNo());
-			pstmt.setString(2, vo.getTitle());
-			pstmt.setLong(3, originVo.getGroupNo());
-			pstmt.setLong(4, originVo.getOrderNo());
-			pstmt.setLong(5, originVo.getDepth());
-			pstmt.setString(6, vo.getContents());
 		 */
 		boolean result = false;
-//		List<BoardVo> list = new ArrayList<BoardVo>();
 		
 		MongoClient client = null;
 		MongoDatabase db = null;
@@ -179,9 +165,8 @@ public class BoardDao implements IBoardDao{
 	}
 	// 게시물 리스팅(게시판)
 	public List<BoardVo> getBoardPageList(PagingBean pagingBean){
-
-//		return list;
 		/*
+		 * 원본 SQL
 		 * 			sql =  "select b.no, b.user_no, b.title, b.group_no, b.order_no, b.depth, "
 					+ " date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views, u.name "
 					+ "	from board b "
@@ -189,10 +174,6 @@ public class BoardDao implements IBoardDao{
 					+ " on b.user_no = u.no "					
 					+ "	order by group_no DESC, order_no ASC"
 					+ " LIMIT ?, ? ;";
-					
-								pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, pagingBean.getStartRowNumber()-1);
-			pstmt.setInt(2, pagingBean.getEndRowNumber() - pagingBean.getStartRowNumber()+1);
 		 */
 		
 		List<BoardVo> list = new ArrayList<BoardVo>();
@@ -206,16 +187,18 @@ public class BoardDao implements IBoardDao{
 			db = getDB(client);
 			collection = getCollection(db);
 			
-			// aggregation 수행 
-			
-//			lookup용 변수 , 파이프라인 준비  
+			// aggregation 수행 	(유사 left outer join) 		
+			// lookup용 변수 , 파이프라인 준비  
+			// user_no 변수를 uno 로 사용
 			List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
 			List<Bson> pipeline = asList(
+					// 조건에 맞는 document filter 
 					match(
 							expr(
 									new Document("$eq", asList("$no", "$$uno"))
 								)
 						)
+					// 결과물에서 name field만 추출, id 제외
 					,project(
 							fields(include("name"),excludeId())
 							)
@@ -223,23 +206,24 @@ public class BoardDao implements IBoardDao{
 			// 페이징 관련 부분
 			List<Document> docList = null;
 			int skipNum = pagingBean.getStartRowNumber()-1; 
-			//System.out.println(skipNum);
 			if( skipNum >0) {
 				docList = collection.aggregate(
 						asList(
-								// 찾아볼 collection / 사용할 변수 / 변수가 사용될 pipeline / output field name
+								// 찾아볼 collection(right collection) / left collection에서 사용할 변수 / 변수가 사용될 pipeline / output field name
 								lookup("user", variable, pipeline, "user_name")
-								// user_name 배열을 해체 ( [1,2,3] -> 1 / 2 / 3 다른 document로 분리
+								// user_name 배열을 해체 ( [1,2,3] -> 1 / 2 / 3 다른 document로 분리)
 								,unwind("$user_name")
-								// 새로운 field 추가 - nesting 된 field를 상위 field에 재지정
+								// 새로운 field 추가 - nesting 된 field를 최상위 field에 재지정
 								,new Document("$addFields",new Document("user_name","$user_name.name"))
 								// group number 별 내림차순 & order number 오름차순
 								,sort(orderBy(descending("group_no"),ascending("order_no")))
 								// 지정한 글 개수 만큼 skip - paging 처리
 								,skip(skipNum)
+								// 페이지당 최대 5개의 게시물로 제한
 								,limit(5)
 							)
-						).into(new ArrayList<Document>());				
+						).into(new ArrayList<Document>());
+			// 제일 마지막 페이지는 skip 추가하지 않고 수행
 			}else {
 				docList = collection.aggregate(
 						asList(
@@ -297,7 +281,12 @@ public class BoardDao implements IBoardDao{
 			Long group_no = vo.getGroupNo();
 			Long order_no = (Long)(collection.find(eq("group_no",group_no)).sort(descending("order_no")).first().get("order_no"));
 			collection.findOneAndDelete(
-					and(eq("no",vo.getNo()),eq("group_no",group_no),eq("order_no",order_no)));
+					and(
+							eq("no",vo.getNo())
+							,eq("group_no",group_no)
+							,eq("order_no",order_no)
+						)
+					);
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -335,22 +324,11 @@ public class BoardDao implements IBoardDao{
 	public BoardVo getBoard(Long no) {
 		System.out.println(no);
 		/*
-		 * 			// 게시물 전체 내용 가져오기
+		 게시물 전체 내용 가져오기
 			sql =  " select b.no, b.user_no, b.title, b.group_no, b.order_no, "
-					+ " b.depth, b.contents, date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views "
-					+ "	from board b "
-					+ " join user u on b.no = ? and b.user_no = u.no;";		
-					
-									vo = new BoardVo();
-				vo.setNo(rs.getLong(1));
-				vo.setUserNo(rs.getLong(2));
-				vo.setTitle(rs.getString(3));
-				vo.setGroupNo(rs.getLong(4));
-				vo.setOrderNo(rs.getLong(5));
-				vo.setDepth(rs.getLong(6));
-				vo.setContents(rs.getString(7));
-				vo.setRegDate(rs.getString(8));
-				vo.setUserName(rs.getString(9));
+			" b.depth, b.contents, date_format(b.reg_date,'%Y-%m-%d %H:%i:%s'), views "
+			"	from board b "
+			" join user u on b.no = ? and b.user_no = u.no;";		
 		 */
 		MongoClient client = null;
 		MongoDatabase db = null;
@@ -360,7 +338,7 @@ public class BoardDao implements IBoardDao{
 			client = getClient();
 			db = getDB(client);
 			collection = getCollection(db);
-			
+			// 게시물 1개로 제한해서 가져온다. 
 			List<Variable<String>> variable = asList(new Variable<>("uno", "$user_no"));
 			List<Bson> pipeline = asList(
 					match(

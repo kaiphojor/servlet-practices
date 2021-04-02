@@ -1,4 +1,13 @@
-# JSP servlet Model 2 MVC site + DB 이중화
+# 모듈 설명
+
+* /mysite02  - JSP/servlet Model 2 site + MySQL
+* /dbreplication  - site + MySQL (DB Replication)
+* /mongodbsite - site + MongoDB (동일 기능 수행)
+* /apitest - XML + JSON ajax request
+
+
+
+# JSP servlet Model 2 MVC site (/mysite02)
 
 * 게시판 사이트
 * 210313 ~ 210318
@@ -26,102 +35,81 @@
 
 ## DB 생성 SQL
 
-user 부터 순서대로 생성 한다.
+DB 초기 설정
 
-* user table
+```
+set names = utf8mb4;
+create database webdb;
+use webdb;
+```
+
+
+
+user 부터 순서대로 테이블을 생성 한다.
+
+* user ( 사용자 )
 
 ```
 -- 회원
 CREATE TABLE `user` (
-	`no`        INT UNSIGNED           NOT NULL COMMENT '번호', -- 번호
-	`name`      VARCHAR(50)            NOT NULL COMMENT '이름', -- 이름
-	`email`     VARCHAR(200)           NOT NULL COMMENT '이메일', -- 이메일
-	`password`  VARCHAR(20)            NOT NULL COMMENT '비밀번호', -- 비밀번호
-	`gender`    ENUM('male','female') NOT NULL COMMENT '성별', -- 성별
-	`join_date` DATETIME               NOT NULL COMMENT '가입일' -- 가입일
-)
-COMMENT '회원';
+`no`        INT UNSIGNED           NOT NULL COMMENT '번호',
+`name`      VARCHAR(50)            NOT NULL COMMENT '이름',
+`email`     VARCHAR(200)           NOT NULL COMMENT '이메일',
+`password`  VARCHAR(20)            NOT NULL COMMENT '비밀번호',
+`gender`    ENUM('male','female') NOT NULL COMMENT '성별',
+`join_date` DATETIME               NOT NULL COMMENT '가입일'
+);
 
--- 회원
-ALTER TABLE `user`
-	ADD CONSTRAINT `PK_user` -- 회원 기본키
-		PRIMARY KEY (
-			`no` -- 번호
-		);
+ALTER TABLE `user` ADD CONSTRAINT `PK_user` PRIMARY KEY (`no` );
+ALTER TABLE `user` MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '번호';
 
-ALTER TABLE `user`
-	MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '번호';
 
 -- 인덱스 추가
 CREATE INDEX idx_user ON user(no);
 
 ```
 
-* guestbook
+* guestbook ( 방명록 )
 
 ```
 -- 방명록
 CREATE TABLE `guestbook` (
-	`no`       INT UNSIGNED NOT NULL COMMENT '번호', -- 번호
-	`name`     VARCHAR(50)  NOT NULL COMMENT '이름', -- 이름
-	`password` VARCHAR(20)  NOT NULL COMMENT '비밀번호', -- 비밀번호
-	`contents` TEXT         NOT NULL COMMENT '내용', -- 내용
-	`reg_date` DATETIME     NOT NULL COMMENT '등록일' -- 등록일
-)
-COMMENT '방명록';
+`no`       INT UNSIGNED NOT NULL COMMENT '번호',
+`name`     VARCHAR(50)  NOT NULL COMMENT '이름',
+`password` VARCHAR(20)  NOT NULL COMMENT '비밀번호',
+`contents` TEXT         NOT NULL COMMENT '내용',
+`reg_date` DATETIME     NOT NULL COMMENT '등록일'
+);
 
--- 방명록
-ALTER TABLE `guestbook`
-	ADD CONSTRAINT `PK_guestbook` -- 방명록 기본키
-		PRIMARY KEY (
-			`no` -- 번호
-		);
+ALTER TABLE `guestbook` ADD CONSTRAINT `PK_guestbook` PRIMARY KEY ( `no` );
 
-ALTER TABLE `guestbook`
-	MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '번호';
+ALTER TABLE `guestbook` MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '번호';
 	
 -- 인덱스 추가
 CREATE INDEX idx_guestbook ON guestbook(no);
 ```
 
-* 게시판
+* board ( 게시판)
 
 ```
 -- 게시글
 CREATE TABLE `board` (
-	`no`       INT UNSIGNED NOT NULL COMMENT '글번호', -- 글번호
-	`user_no`  INT UNSIGNED NOT NULL COMMENT '회원번호', -- 회원번호
-	`title`    VARCHAR(50)  NOT NULL COMMENT '타이틀', -- 타이틀
-	`group_no` INT UNSIGNED NOT NULL COMMENT '그룹번호', -- 그룹번호
-	`order_no` INT UNSIGNED NOT NULL COMMENT '그룹내 순서', -- 그룹내 순서
-	`depth`    INT UNSIGNED NOT NULL COMMENT '글의 깊이', -- 글의 깊이
-	`contents` TEXT         NOT NULL COMMENT '내용', -- 내용
-	`reg_date` DATETIME     NOT NULL COMMENT '등록일', -- 등록일
-	`views`    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '조회수' -- 조회수
-)
-COMMENT '게시글';
+`no`       INT UNSIGNED NOT NULL COMMENT '글번호',
+`user_no`  INT UNSIGNED NOT NULL COMMENT '회원번호',
+`title`    VARCHAR(50)  NOT NULL COMMENT '타이틀',
+`group_no` INT UNSIGNED NOT NULL COMMENT '그룹번호',
+`order_no` INT UNSIGNED NOT NULL COMMENT '그룹내 순서',
+`depth`    INT UNSIGNED NOT NULL COMMENT '글의 깊이',
+`contents` TEXT         NOT NULL COMMENT '내용',
+`reg_date` DATETIME     NOT NULL COMMENT '등록일',
+`views`    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '조회수'
+);
 
--- 게시글
-ALTER TABLE `board`
-	ADD CONSTRAINT `PK_board` -- 게시글 기본키
-		PRIMARY KEY (
-			`no` -- 글번호
-		);
 
-ALTER TABLE `board`
-	MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '글번호';
+ALTER TABLE `board` ADD CONSTRAINT `PK_board` PRIMARY KEY ( `no` );
+ALTER TABLE `board` MODIFY COLUMN `no` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '글번호';
+ALTER TABLE `board` ADD CONSTRAINT `FK_user_TO_board` FOREIGN KEY ( `user_no` ) REFERENCES `user` ( `no` ) ON DELETE NO ACTION;
 
--- 게시글
-ALTER TABLE `board`
-	ADD CONSTRAINT `FK_user_TO_board` -- 회원 -> 게시글
-		FOREIGN KEY (
-			`user_no` -- 회원번호
-		)
-		REFERENCES `user` ( -- 회원
-			`no` -- 번호
-		)
-		ON DELETE NO ACTION;
-		
 -- 인덱스 추가
 CREATE INDEX idx_board ON board(no);
 
@@ -129,22 +117,41 @@ CREATE INDEX idx_board ON board(no);
 
 
 
-# DB 이중화(replication)
+# DB 이중화(/dbreplication)
 
 * 결과 LINK - https://enchiridion.tistory.com/63
 
 ![db_replication_architecture](./db_replication.png)
 
-* 상세 - DB 이중화를 통한 부하 분산
+* 상세 - DB 이중화
   * docker container 사용해서 mysql master db, slave db를 생성, 이중화 
   * master 에서는 insert, update, delete 수행
   * slave에서는 select만  수행
 
-* 적용된 commit
-  * https://github.com/kaiphojor/servlet-practices/commit/866ae6742a490f201479325407dc9edca10c4af6
-
 * 참고
   * https://jupiny.com/2017/11/07/docker-mysql-replicaiton/
 
-  
+
+# mongo DB로 교체 (/mongodbsite)
+
+* DAO file 만 교체 
+* MySQL query -> MongoDB query
+
+
+
+## 변경사항
+
+* Mongodb java driver
+* slf4j ( option )
+
+mysite02 모듈 복사 후 모듈 내 pom.xml 에 dependency 추가
+
+## 초기설정
+
+* src/test/java 내 InitMongoDB 실행
+* mongodb -> webdb database ->  bcounter collection -> document -> seq 속성 int64 변경 
+
+
+
+
 
