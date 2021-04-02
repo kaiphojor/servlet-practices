@@ -25,8 +25,22 @@
 				<form id="search_form" action="${pageContext.request.contextPath}/board" method="post">
 					<select name="category" id="category">
 					  <option value="title">제목</option>
-					  <option value="contents">내용</option>
-					  <option value="user">사용자</option>
+						<c:choose>
+						  <c:when test="${category == 'contents' }">
+						  	<option value="contents" selected>내용</option>
+						  </c:when>
+						  <c:otherwise>
+						   <option value="contents">내용</option>
+						  </c:otherwise>
+						</c:choose>
+						<c:choose>
+						  <c:when test="${category == 'user' }">
+						  	<option value="user" selected>사용자</option>
+						  </c:when>
+						  <c:otherwise>
+						   <option value="user">사용자</option>
+						  </c:otherwise>
+						</c:choose>					  
 					</select>
 					<c:choose>
 						<c:when test="${empty keyword}">
