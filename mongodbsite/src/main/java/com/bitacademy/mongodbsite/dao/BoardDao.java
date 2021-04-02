@@ -279,14 +279,22 @@ public class BoardDao implements IBoardDao{
 			collection = getCollection(db);
 			// 해당 그룹 내에서 답글이 없는 글(마지막 순서) 만 삭제 가능하다.
 			Long group_no = vo.getGroupNo();
-			Long order_no = (Long)(collection.find(eq("group_no",group_no)).sort(descending("order_no")).first().get("order_no"));
-			collection.findOneAndDelete(
-					and(
-							eq("no",vo.getNo())
-							,eq("group_no",group_no)
-							,eq("order_no",order_no)
-						)
-					);
+			Long order_no = (Long)(collection.find(eq("group_no",group_no))
+					.sort(descending("order_no"))
+					.first().get("order_no"));
+			// 가장 마지막 순서는 삭제 가능
+			if(order_no == vo.getOrderNo()) {
+				System.out.println("마지막 순서");
+				collection.findOneAndDelete(eq("no",vo.getNo()));
+			// 답글이 없는 글은 삭제 가능
+			}else {
+				Document nextDoc = collection.find(and(eq("group_no",group_no),eq("order_no",vo.getOrderNo()+1))).first();
+				// 바로 밑에 위치한 글이 현재글의 답글이 아니라면 삭제
+				if(nextDoc.getLong("depth") != vo.getDepth() + 1) {
+					System.out.println("답글없음");
+					collection.findOneAndDelete(eq("no",vo.getNo()));
+				}
+			}
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
