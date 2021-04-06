@@ -48,5 +48,6 @@
 		<module>mongodbsite</module>
 		<module>apitest</module>
 		<module>dbreplication</module>
+		<module>uploadtest</module>
 	</modules>
 </project>

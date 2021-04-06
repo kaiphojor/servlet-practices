@@ -46,7 +46,7 @@ public class MainServlet extends HttpServlet {
 		}
 	}
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+		WebUtil.forward("/WEB-INF/views/main/fileupload.jsp", request, response);		
 	}
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
