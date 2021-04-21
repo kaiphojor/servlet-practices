@@ -16,8 +16,16 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp" />
 		<div id="wrapper">
 			<div id="content">
+				<h3>파일 업로드 예제</h3>
+				<form method="post" action="${pageContext.request.contextPath }/"
+					enctype="multipart/form-data">
+					<input type="file" name="photo" /> <input type="submit"
+						value="upload" />
+				</form>
 				<h3>히스토리 초기화</h3>
-				<button onclick="clearAll()" />확인</button>
+				<button onclick="clearAll()" />
+				확인
+				</button>
 				<h2>접근 주소 목록</h2>
 				<div>
 					<ol id='browserHistory'>
@@ -52,7 +60,7 @@
 				ol.appendChild(li);
 			}
 		}
-		
+
 		//클릭한 내용 가져올 때 
 		var clickHist = localStorage.getItem('clickHistory');
 		var clickHistoryList;
@@ -71,16 +79,15 @@
 				ol.appendChild(li);
 			}
 		}
-		
+
 		// 전체 히스토리 초기화 및 화면 수정
-		function clearAll(){
+		function clearAll() {
 			localStorage.removeItem('history');
 			localStorage.removeItem('clickHistory');
-			document.getElementById('browserHistory').innerHTML= '';
+			document.getElementById('browserHistory').innerHTML = '';
 			document.getElementById('clickHistory').innerHTML = '';
 
 		}
-		
 	</script>
 </body>
 </html>

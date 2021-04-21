@@ -28,11 +28,6 @@
 						남기기<br>
 					</p>
 				</div>
-				<form method="post" action="${pageContext.request.contextPath }/"
-					enctype="multipart/form-data">
-					<input type="file" name="photo" /> <input type="submit"
-						value="upload" />
-				</form>
 			</div>
 		</div>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp" />
